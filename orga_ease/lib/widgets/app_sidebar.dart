@@ -69,16 +69,16 @@ class AppSidebar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (exp)
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(8, 2, 8, 8),
-                    child: Text('MENU UTAMA',
-                        style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.1,
-                            color: Color(0xFF94A3B8))),
-                  ),
+                // if (exp)
+                //   const Padding(
+                //     padding: EdgeInsets.fromLTRB(8, 2, 8, 8),
+                //     child: Text('MENU UTAMA',
+                //         style: TextStyle(
+                //             fontSize: 11,
+                //             fontWeight: FontWeight.w800,
+                //             letterSpacing: 1.1,
+                //             color: Color(0xFF94A3B8))),
+                //   ),
                 _Tile(
                   item: menus[0],
                   selected: selectedIndex == 0,
@@ -122,6 +122,8 @@ class AppSidebar extends StatelessWidget {
   }
 }
 /// Header gradient SAMA dgn topbar agar menyatu tanpa sekat.
+/// - Logo "OE" = tombol untuk MEMBUKA sidebar (saat minimize / drawer tertutup).
+/// - Panah ke kiri = tombol untuk MENUTUP / minimize sidebar.
 class _Header extends StatelessWidget {
   final bool expanded;
   final VoidCallback onToggle;
@@ -129,40 +131,60 @@ class _Header extends StatelessWidget {
   const _Header({required this.expanded, required this.onToggle, this.onClose});
   @override
   Widget build(BuildContext context) {
+    Widget oeLogo({required double fontSize, required String tooltip}) {
+      return Tooltip(
+        message: tooltip,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: expanded ? null : onToggle,
+          child: Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12)),
+            child: Text('OE',
+                style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.primaryPink,
+                    fontSize: fontSize)),
+          ),
+        ),
+      );
+    }
+
     return Container(
       height: 64,
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft, end: Alignment.bottomRight,
-          colors: [AppColors.primaryPink, AppColors.primaryTeal],
-        ),
+        // gradient: LinearGradient(
+        //   begin: Alignment.topLeft, end: Alignment.bottomRight,
+          color: AppColors.primaryPink,
+        // ),
       ),
       padding: EdgeInsets.symmetric(horizontal: expanded ? 16 : 8, vertical: 10),
-      child: expanded ? Row(children: [
-        Container(
-          width: 38, height: 38, alignment: Alignment.center,
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-          child: const Text('OE', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.primaryPink, fontSize: 15)),
-        ),
-        const SizedBox(width: 10),
-        // const Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        //   Text('OrgaEase', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17)),
-        //   Text('Kelola organisasi', style: TextStyle(color: Colors.white70, fontSize: 11)),
-        // ])),
-        if (onClose != null)
-          IconButton(tooltip: 'Tutup menu', icon: const Icon(Icons.close_rounded, color: Colors.white), onPressed: onClose)
-        else
-          IconButton(tooltip: 'Minimize sidebar', icon: const Icon(Icons.chevron_left_rounded, color: Colors.white), onPressed: onToggle),
-      ]) : Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Container(
-          width: 38, height: 38, alignment: Alignment.center,
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-          child: const Text('OE', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.primaryPink, fontSize: 14)),
-        ),
-        // InkWell(onTap: onToggle, borderRadius: BorderRadius.circular(8),
-        //   child: const Padding(padding: EdgeInsets.only(top: 2),
-        //     child: Icon(Icons.chevron_right_rounded, color: Colors.white, size: 18))),
-      ]),
+      child: expanded
+          ? Row(children: [
+              // Logo statis saat sidebar terbuka (tombol buka tidak perlu).
+              Container(
+                width: 38, height: 38, alignment: Alignment.center,
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                child: const Text('OE', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.primaryPink, fontSize: 15)),
+              ),
+              const Spacer(flex: 1),
+              const Text('OrgaEase', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 17)),
+              const Spacer(flex: 3),
+              // Panah ke kiri = tutup / minimize sidebar.
+              IconButton(
+                tooltip: onClose != null ? 'Tutup menu' : 'Tutup sidebar',
+                icon: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 28),
+                onPressed: onClose ?? onToggle,
+              ),
+            ])
+          : Center(
+              // Logo OE = tombol untuk MEMBUKA sidebar saat minimize.
+              child: oeLogo(fontSize: 14, tooltip: 'Buka sidebar'),
+            ),
     );
   }
 }

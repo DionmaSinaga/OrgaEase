@@ -130,16 +130,32 @@ class _HomePageState extends State<HomePage> {
           colors: [AppColors.primaryPink, AppColors.primaryTeal]),
         boxShadow: [BoxShadow(color: Color(0x1A000000), blurRadius: 8, offset: Offset(0, 2))],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      // TANPA hamburger: navigasi buka/tutup hanya via logo "OE"
+      // (mode minimize) dan panah kiri (di header sidebar).
       child: Row(children: [
-        IconButton(
-          tooltip: narrow ? 'Buka menu' : (_collapsed ? 'Perluas sidebar' : 'Minimize sidebar'),
-          icon: Icon(narrow ? Icons.menu_rounded : (_collapsed ? Icons.menu_open_rounded : Icons.menu_rounded), color: Colors.white),
-          onPressed: () {
-            if (narrow) { _scaffoldKey.currentState?.openDrawer(); }
-            else { setState(() => _collapsed = !_collapsed); }
-          },
-        ),
+        // Saat drawer tertutup di layar sempit, logo OE di topbar
+        // berfungsi sebagai tombol pembuka drawer.
+        if (narrow)
+          Tooltip(
+            message: 'Buka menu',
+            child: InkWell(
+              borderRadius: BorderRadius.circular(10),
+              onTap: () => _scaffoldKey.currentState?.openDrawer(),
+              child: Container(
+                width: 36, height: 36, alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10)),
+                child: const Text('OE',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.primaryPink,
+                        fontSize: 13)),
+              ),
+            ),
+          ),
+        if (narrow) const SizedBox(width: 10),
         Icon(cur.icon, color: Colors.white, size: 22),
         const SizedBox(width: 10),
         Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -194,7 +210,14 @@ class _HomePageState extends State<HomePage> {
               decoration: BoxDecoration(color: item.color.withValues(alpha: 0.12), shape: BoxShape.circle),
               child: Icon(item.icon, size: 36, color: item.color)),
             const SizedBox(height: 16),
-            Text(item.label, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textDark)),
+            Text(item.label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textDark)),
             const SizedBox(height: 8),
             Text('Halaman "${item.label}" segera hadir di OrgaEase. Untuk sekarang kamu bisa kembali ke Beranda.',
               textAlign: TextAlign.center,
@@ -403,6 +426,8 @@ class _MenuCard extends StatelessWidget {
             const SizedBox(height: 10),
             Text(item.label,
                 textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
@@ -462,11 +487,15 @@ class _WelcomeText extends StatelessWidget {
       children: [
         Text('$greeting,',
             textAlign: align,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
                 fontSize: 14,
                 color: Colors.white.withValues(alpha: 0.9))),
         Text(name,
             textAlign: align,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
@@ -474,11 +503,15 @@ class _WelcomeText extends StatelessWidget {
         const SizedBox(height: 4),
         Text(email,
             textAlign: align,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
                 fontSize: 13,
                 color: Colors.white.withValues(alpha: 0.9))),
         const SizedBox(height: 2),
         Text('Anggota sejak $memberSince',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             textAlign: align,
             style: TextStyle(
                 fontSize: 12,

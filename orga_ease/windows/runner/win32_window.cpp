@@ -31,6 +31,12 @@ static int g_active_window_count = 0;
 
 using EnableNonClientDpiScaling = BOOL __stdcall(HWND hwnd);
 
+// Batas minimal ukuran window (logical pixel, sebelum skala DPI).
+// Dipakai di WM_GETMINMAXINFO agar jendela tidak bisa di-resize
+// lebih kecil dari ini -> mencegah strip kuning "overflowed".
+constexpr int kMinWindowWidth = 400;
+constexpr int kMinWindowHeight = 620;
+
 // Scale helper to convert logical scaler values to physical using passed in
 // scale factor
 int Scale(int source, double scale_factor) {
@@ -216,6 +222,22 @@ Win32Window::MessageHandler(HWND hwnd,
     case WM_DWMCOLORIZATIONCOLORCHANGED:
       UpdateTheme(hwnd);
       return 0;
+
+    case WM_GETMINMAXINFO: {
+      // Kunci ukuran minimal window agar UI tidak overflow.
+      // 400x620 (logical) = cukup untuk form auth 420-max + padding
+      // adaptif dan grid menu 2 kolom. Diskalakan ke physical pixel
+      // sesuai DPI monitor agar konsisten di 100%/125%/150%.
+      auto* mmi = reinterpret_cast<MINMAXINFO*>(lparam);
+      HMONITOR monitor =
+          MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+      UINT dpi = FlutterDesktopGetDpiForMonitor(monitor);
+      if (dpi == 0) dpi = 96;
+      double scale = static_cast<double>(dpi) / 96.0;
+      mmi->ptMinTrackSize.x = Scale(kMinWindowWidth, scale);
+      mmi->ptMinTrackSize.y = Scale(kMinWindowHeight, scale);
+      return 0;
+    }
   }
 
   return DefWindowProc(window_handle_, message, wparam, lparam);
