@@ -116,15 +116,19 @@ class _RegisterPageState extends State<RegisterPage> {
               gradientColors: const [
                 AppColors.primaryTeal, AppColors.tealHover]),
             const SizedBox(height: 12),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const Text('Sudah punya akun? ',
-                style: TextStyle(fontSize: 13)),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const Text('Masuk', style: TextStyle(fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryPink))),
-            ]),
+            // Wrap agar tidak overflow saat jendela disempitkan.
+            Wrap(alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                const Text('Sudah punya akun? ',
+                  style: TextStyle(fontSize: 13)),
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: const Text('Masuk',
+                    style: TextStyle(fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryPink))),
+              ]),
           ],
         ),
       ),

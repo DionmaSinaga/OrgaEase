@@ -93,26 +93,39 @@ class _LoginPageState extends State<LoginPage> {
                 return null;
               }),
             const SizedBox(height: 8),
-            Row(children: [
-              Checkbox(value: _rem, activeColor: AppColors.primaryTeal,
-                onChanged: (v) => setState(() => _rem = v ?? false)),
-              const Text('Ingat saya', style: TextStyle(fontSize: 13)),
-              const Spacer(),
-              TextButton(onPressed: () {}, child: const Text('Lupa sandi?',
-                style: TextStyle(color: AppColors.primaryPink,
-                  fontWeight: FontWeight.w600, fontSize: 13))),
-            ]),
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  Checkbox(value: _rem,
+                    activeColor: AppColors.primaryTeal,
+                    onChanged: (v) =>
+                      setState(() => _rem = v ?? false)),
+                  const Text('Ingat saya',
+                    style: TextStyle(fontSize: 13)),
+                ]),
+                TextButton(onPressed: () {},
+                  child: const Text('Lupa sandi?',
+                    style: TextStyle(color: AppColors.primaryPink,
+                      fontWeight: FontWeight.w600, fontSize: 13))),
+              ]),
             GradientButton(text: 'Masuk', isLoading: _load, onPressed: _login),
             const SizedBox(height: 14),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              const Text('Belum punya akun? ', style: TextStyle(fontSize: 13)),
-              GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(
-                  builder: (_) => const RegisterPage())),
-                child: const Text('Daftar', style: TextStyle(fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryPink))),
-            ]),
+            // Wrap agar tidak overflow / newline aneh saat jendela sempit.
+            Wrap(alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                const Text('Belum punya akun? ',
+                  style: TextStyle(fontSize: 13)),
+                GestureDetector(
+                  onTap: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => const RegisterPage())),
+                  child: const Text('Daftar',
+                    style: TextStyle(fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryPink))),
+              ]),
           ],
         ),
       ),

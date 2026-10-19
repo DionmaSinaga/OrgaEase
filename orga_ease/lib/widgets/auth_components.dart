@@ -55,20 +55,27 @@ class AuthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.cardGray),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.textDark.withValues(alpha: 0.08),
-            blurRadius: 24, offset: const Offset(0, 10)),
-        ],
-      ),
-      child: child,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double w = constraints.maxWidth;
+        // Padding card mengecil di layar sempit agar isi tidak terjepit.
+        final double pad = w < 340 ? 16 : (w < 420 ? 20 : 24);
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(pad),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.cardGray),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.textDark.withValues(alpha: 0.08),
+                blurRadius: 24, offset: const Offset(0, 10)),
+            ],
+          ),
+          child: child,
+        );
+      },
     );
   }
 }
