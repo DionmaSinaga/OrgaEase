@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orga_ease/app_color.dart';
+import 'package:orga_ease/repositories/auth_repository.dart';
 import 'package:orga_ease/widgets/auth_layout.dart';
 import 'package:orga_ease/widgets/auth_textfield.dart';
 import 'package:orga_ease/widgets/auth_components.dart';
@@ -27,15 +28,35 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Future<void> _reg() async {
     if (!_form.currentState!.validate()) return;
+    if (!_agree) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Centang persetujuan S&K terlebih dahulu.'),
+        backgroundColor: AppColors.warning,
+        behavior: SnackBarBehavior.floating));
+      return;
+    }
     setState(() => _load = true);
-    await Future.delayed(const Duration(seconds: 1));
-    if (!mounted) return;
-    setState(() => _load = false);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Akun berhasil dibuat!'),
-      backgroundColor: AppColors.success,
-      behavior: SnackBarBehavior.floating));
-    Navigator.pop(context);
+    try {
+      await AuthRepository().register(
+        name: _name.text,
+        email: _email.text,
+        password: _pass.text,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Akun berhasil dibuat! Silakan login.'),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating));
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(e.toString().replaceFirst('Exception: ', '')),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating));
+    } finally {
+      if (mounted) setState(() => _load = false);
+    }
   }
 
   @override
