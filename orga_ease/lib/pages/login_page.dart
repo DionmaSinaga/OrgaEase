@@ -4,6 +4,7 @@ import 'package:orga_ease/repositories/auth_repository.dart';
 import 'package:orga_ease/widgets/auth_layout.dart';
 import 'package:orga_ease/widgets/auth_textfield.dart';
 import 'package:orga_ease/widgets/auth_components.dart';
+import 'package:orga_ease/pages/home_page.dart';
 import 'package:orga_ease/pages/register_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -30,6 +31,10 @@ class _LoginPageState extends State<LoginPage> {
         password: _pass.text,
       );
       if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => HomePage(user: user)),
+        (route) => false,
+      );
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Login berhasil! Selamat datang, ${user.name}.'),
         backgroundColor: AppColors.success,
