@@ -19,6 +19,12 @@ List<SideMenuItem> defaultSideMenus() => const [
     ];
 
 /// Sidebar kiri Discord-style, menyatu dgn appbar (header gradient sama).
+///
+/// - Di layar lebar ([collapsed] mengatur minimize/expand seperti biasa).
+/// - Di dalam [Drawer] (layar sempit, [inDrawer] = true): SELALU tampil
+///   expanded penuh berisi teks, walau sidebar desktop sedang minimize.
+///   Ini mencegah bug: minimize di layar penuh -> kecilkan window ->
+///   drawer terbuka tapi tanpa teks sehingga "OE" harus diklik 2x.
 class AppSidebar extends StatelessWidget {
   final List<SideMenuItem> menus;
   final int selectedIndex;
@@ -33,6 +39,7 @@ class AppSidebar extends StatelessWidget {
   final VoidCallback onSettings;
   final VoidCallback onLogout;
   final VoidCallback? onCloseDrawer;
+  final bool inDrawer;
 
   const AppSidebar({
     super.key,
@@ -49,11 +56,14 @@ class AppSidebar extends StatelessWidget {
     required this.onSettings,
     required this.onLogout,
     this.onCloseDrawer,
+    this.inDrawer = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool exp = !collapsed;
+    // Drawer selalu expanded penuh (ada teks menu). Status minimize
+    // (_collapsed) hanya berlaku untuk sidebar di layar lebar.
+    final bool exp = inDrawer ? true : !collapsed;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -163,6 +173,9 @@ class _Header extends StatelessWidget {
         // ),
       ),
       padding: EdgeInsets.symmetric(horizontal: expanded ? 16 : 8, vertical: 10),
+      // Clip agar Row expanded tidak overflow sesaat saat AnimatedContainer
+      // masih di tengah animasi 80 <-> 264px.
+      clipBehavior: Clip.hardEdge,
       child: expanded
           ? Row(children: [
               // Logo statis saat sidebar terbuka (tombol buka tidak perlu).

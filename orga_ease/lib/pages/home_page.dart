@@ -18,6 +18,13 @@ class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   int _selectedIndex = 0;
   bool _collapsed = false;
+  // Apakah ISI sidebar tampil versi expanded (ada teks).
+  // Dipisah dari [_collapsed] (lebar container) agar tidak overflow sesaat:
+  // saat expand, lebar masih ~80px selama animasi 220ms sedangkan teks
+  // butuh ~264px. Jadi teks baru dipasang SETELAH animasi selesai.
+  bool _contentExpanded = true;
+  // Token untuk membatalkan future tertunda saat user toggle cepat.
+  int _collapseToken = 0;
   bool _manageExpanded = true;
   late final List<SideMenuItem> _menus = defaultSideMenus();
   static const double _wExp = 264;
@@ -73,13 +80,14 @@ class _HomePageState extends State<HomePage> {
     return AppSidebar(
       menus: _menus,
       selectedIndex: _selectedIndex,
-      collapsed: _collapsed,
+      // Di mode lebar: isi mengikuti _contentExpanded (tertunda 230ms
+      // saat expand agar tidak overflow). Di drawer: selalu expanded.
+      collapsed: inDrawer ? false : !_contentExpanded,
       manageExpanded: _manageExpanded,
       userName: widget.user.name,
       userEmail: widget.user.email,
       initials: _initials,
-      onToggleCollapsed: () =>
-          setState(() => _collapsed = !_collapsed),
+      onToggleCollapsed: inDrawer ? () {} : _toggleCollapsed,
       onToggleManage: () =>
           setState(() => _manageExpanded = !_manageExpanded),
       onSelect: (i) =>
@@ -89,7 +97,43 @@ class _HomePageState extends State<HomePage> {
       onCloseDrawer: inDrawer
           ? () => Navigator.of(context).pop()
           : null,
+      inDrawer: inDrawer,
     );
+  }
+
+  /// Dipanggil sebelum Scaffold mode sempit dibangun: pastikan drawer
+  /// selalu dibuka dalam keadaan expanded penuh, walau sidebar desktop
+  /// sedang minimize. Mencegah bug "klik OE 2x".
+  void _openDrawer() {
+    if (_collapsed) setState(() => _collapsed = false);
+    if (!_contentExpanded) setState(() => _contentExpanded = true);
+    _scaffoldKey.currentState?.openDrawer();
+  }
+
+  /// Toggle minimize/expand sidebar TANPA overflow sesaat.
+  ///
+  /// - Collapse (264 -> 80): isi langsung jadi ikon (aman di lebar berapa pun),
+  ///   lalu lebar container dianimasikan.
+  /// - Expand (80 -> 264): lebar container dianimasikan DULU (isi tetap ikon),
+  ///   teks baru dipasang setelah animasi 220ms selesai. Tanpa jeda ini,
+  ///   teks langsung dirender saat lebar masih ~80px -> strip kuning 0,2 detik.
+  void _toggleCollapsed() {
+    final int token = ++_collapseToken;
+    if (!_collapsed) {
+      // Mulai collapse: kecilkan isi dulu, baru container.
+      setState(() {
+        _collapsed = true;
+        _contentExpanded = false;
+      });
+    } else {
+      // Mulai expand: lebarkan container dulu (isi tetap ikon)...
+      setState(() => _collapsed = false);
+      // ...teks dipasang setelah animasi lebar (220ms) selesai.
+      Future.delayed(const Duration(milliseconds: 230), () {
+        if (!mounted || token != _collapseToken) return;
+        setState(() => _contentExpanded = true);
+      });
+    }
   }
 
   @override
@@ -113,7 +157,16 @@ class _HomePageState extends State<HomePage> {
             width: _collapsed ? _wCol : _wExp,
             decoration: const BoxDecoration(color: Colors.white,
               border: Border(right: BorderSide(color: AppColors.cardGray))),
-            child: _sidebar(inDrawer: false),
+            // clipBehavior memotong sisa render 1 frame terakhir bila ada,
+            // sehingga strip kuning "overflowed" tidak sempat terlihat.
+            clipBehavior: Clip.hardEdge,
+            child: SizedBox(
+              // Kunci lebar child = lebar target animasi. Tanpa ini, Row
+              // expanded di dalam (_Header/_Tile) memaksa min. width 264px
+              // saat container masih 80px -> overflow sesaat.
+              width: _collapsed ? _wCol : _wExp,
+              child: _sidebar(inDrawer: false),
+            ),
           ),
           Expanded(child: Column(children: [_topBar(false), Expanded(child: _content())])),
         ]),
@@ -141,7 +194,7 @@ class _HomePageState extends State<HomePage> {
             message: 'Buka menu',
             child: InkWell(
               borderRadius: BorderRadius.circular(10),
-              onTap: () => _scaffoldKey.currentState?.openDrawer(),
+              onTap: _openDrawer,
               child: Container(
                 width: 36, height: 36, alignment: Alignment.center,
                 decoration: BoxDecoration(
