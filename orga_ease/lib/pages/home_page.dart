@@ -3,13 +3,26 @@ import 'package:orga_ease/app_color.dart';
 import 'package:orga_ease/models/app_user.dart';
 import 'package:orga_ease/pages/login_page.dart';
 import 'package:orga_ease/widgets/auth_components.dart';
+import 'package:orga_ease/widgets/app_sidebar.dart';
 
-/// Halaman home / welcoming setelah user berhasil login.
-/// Responsif untuk window Windows yang di-resize.
-class HomePage extends StatelessWidget {
+/// Homepage dgn sidebar kiri menyatu dgn appbar + bisa minimize.
+/// Sidebar berisi kategori homepage; bawah = profil ala Discord.
+class HomePage extends StatefulWidget {
   final AppUser user;
-
   const HomePage({super.key, required this.user});
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _selectedIndex = 0;
+  bool _collapsed = false;
+  bool _manageExpanded = true;
+  late final List<SideMenuItem> _menus = defaultSideMenus();
+  static const double _wExp = 264;
+  static const double _wCol = 80;
+  static const double _topH = 64;
 
   String get _greeting {
     final h = DateTime.now().hour;
@@ -20,16 +33,14 @@ class HomePage extends StatelessWidget {
   }
 
   String get _initials {
-    final parts = user.name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty) return '?';
-    if (parts.length == 1) {
-      return parts.first.isEmpty ? '?' : parts.first[0].toUpperCase();
-    }
+    final parts = widget.user.name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return '?';
+    if (parts.length == 1) return parts.first[0].toUpperCase();
     return (parts.first[0] + parts.last[0]).toUpperCase();
   }
 
   String get _memberSince {
-    final d = user.createdAt;
+    final d = widget.user.createdAt;
     const months = [
       '', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
       'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
@@ -39,78 +50,168 @@ class HomePage extends StatelessWidget {
     return '${d.day} $m ${d.year}';
   }
 
-  void _logout(BuildContext context) {
+  void _logout() {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginPage()),
       (route) => false,
     );
   }
 
-  void _soon(BuildContext context, String label) {
+  void _soon(String label) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('$label segera hadir di OrgaEase.'),
       behavior: SnackBarBehavior.floating,
     ));
   }
 
+  void _selectMenu(int i, {bool fromDrawer = false}) {
+    setState(() => _selectedIndex = i);
+    if (fromDrawer) Navigator.of(context).pop();
+  }
+
+  AppSidebar _sidebar({required bool inDrawer}) {
+    return AppSidebar(
+      menus: _menus,
+      selectedIndex: _selectedIndex,
+      collapsed: _collapsed,
+      manageExpanded: _manageExpanded,
+      userName: widget.user.name,
+      userEmail: widget.user.email,
+      initials: _initials,
+      onToggleCollapsed: () =>
+          setState(() => _collapsed = !_collapsed),
+      onToggleManage: () =>
+          setState(() => _manageExpanded = !_manageExpanded),
+      onSelect: (i) =>
+          _selectMenu(i, fromDrawer: inDrawer),
+      onSettings: () => _soon('Pengaturan'),
+      onLogout: _logout,
+      onCloseDrawer: inDrawer
+          ? () => Navigator.of(context).pop()
+          : null,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final menus = [
-      _MenuItem('Organisasi Saya', Icons.groups_rounded,
-          AppColors.primaryPink),
-      _MenuItem(
-          'Kegiatan', Icons.event_note_rounded, AppColors.primaryTeal),
-      _MenuItem('Anggota', Icons.person_outline_rounded,
-          AppColors.tealHover),
-      _MenuItem(
-          'Laporan', Icons.bar_chart_rounded, AppColors.pinkHover),
-    ];
+    return LayoutBuilder(builder: (context, c) {
+      final bool narrow = c.maxWidth < 760;
+      if (narrow) {
+        return Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: AppColors.backgroundWhite,
+          drawer: Drawer(width: _wExp, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero), child: _sidebar(inDrawer: true)),
+          body: Column(children: [_topBar(true), Expanded(child: _content())]),
+        );
+      }
+      return Scaffold(
+        backgroundColor: AppColors.backgroundWhite,
+        body: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeInOut,
+            width: _collapsed ? _wCol : _wExp,
+            decoration: const BoxDecoration(color: Colors.white,
+              border: Border(right: BorderSide(color: AppColors.cardGray))),
+            child: _sidebar(inDrawer: false),
+          ),
+          Expanded(child: Column(children: [_topBar(false), Expanded(child: _content())])),
+        ]),
+      );
+    });
+  }
 
-    return Scaffold(
-      backgroundColor: AppColors.backgroundWhite,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('OrgaEase',
-            style: TextStyle(fontWeight: FontWeight.w800)),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            tooltip: 'Keluar',
-            icon: const Icon(Icons.logout_rounded),
-            onPressed: () => _logout(context),
-          ),
-        ],
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppColors.primaryPink, AppColors.primaryTeal],
-            ),
-          ),
-        ),
+  Widget _topBar(bool narrow) {
+    final cur = _menus[_selectedIndex];
+    return Container(
+      height: _topH,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+          colors: [AppColors.primaryPink, AppColors.primaryTeal]),
+        boxShadow: [BoxShadow(color: Color(0x1A000000), blurRadius: 8, offset: Offset(0, 2))],
       ),
-      body: _HomeBody(
-        user: user,
-        menus: menus,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(children: [
+        IconButton(
+          tooltip: narrow ? 'Buka menu' : (_collapsed ? 'Perluas sidebar' : 'Minimize sidebar'),
+          icon: Icon(narrow ? Icons.menu_rounded : (_collapsed ? Icons.menu_open_rounded : Icons.menu_rounded), color: Colors.white),
+          onPressed: () {
+            if (narrow) { _scaffoldKey.currentState?.openDrawer(); }
+            else { setState(() => _collapsed = !_collapsed); }
+          },
+        ),
+        Icon(cur.icon, color: Colors.white, size: 22),
+        const SizedBox(width: 10),
+        Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(cur.label, maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
+          if (!narrow) Text('$_greeting, ${widget.user.name}', maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
+        ])),
+        IconButton(tooltip: 'Notifikasi', icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+          onPressed: () => _soon('Notifikasi')),
+        const SizedBox(width: 4),
+        // Container(width: 36, height: 36, alignment: Alignment.center,
+        //   decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.25),
+        //     shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 1.5)),
+        //   child: Text(_initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13))),
+        // const SizedBox(width: 8),
+      ]),
+    );
+  }
+
+  Widget _content() {
+    if (_selectedIndex == 0) {
+      return _HomeBody(
+        user: widget.user,
+        menus: _menus.sublist(1),
         initials: _initials,
         greeting: _greeting,
         memberSince: _memberSince,
-        onLogout: () => _logout(context),
-        onMenuTap: (label) => _soon(context, label),
-      ),
+        onLogout: _logout,
+        onMenuTap: (label) {
+          final idx = _menus.indexWhere((m) => m.label == label);
+          if (idx != -1) {
+            setState(() => _selectedIndex = idx);
+          } else {
+            _soon(label);
+          }
+        },
+      );
+    }
+    final item = _menus[_selectedIndex];
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      child: Center(child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 960),
+        child: Container(
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.cardGray),
+            boxShadow: [BoxShadow(color: AppColors.textDark.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 8))]),
+          child: Column(children: [
+            Container(padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(color: item.color.withValues(alpha: 0.12), shape: BoxShape.circle),
+              child: Icon(item.icon, size: 36, color: item.color)),
+            const SizedBox(height: 16),
+            Text(item.label, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textDark)),
+            const SizedBox(height: 8),
+            Text('Halaman "${item.label}" segera hadir di OrgaEase. Untuk sekarang kamu bisa kembali ke Beranda.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 13.5, height: 1.5, color: AppColors.textDark.withValues(alpha: 0.65))),
+            const SizedBox(height: 20),
+            SizedBox(width: 220, child: GradientButton(text: 'Kembali ke Beranda',
+              onPressed: () => setState(() => _selectedIndex = 0))),
+          ]),
+        ),
+      )),
     );
   }
 }
 
-class _MenuItem {
-  final String label;
-  final IconData icon;
-  final Color color;
-  const _MenuItem(this.label, this.icon, this.color);
-}
-
 class _HomeBody extends StatelessWidget {
   final AppUser user;
-  final List<_MenuItem> menus;
+  final List<SideMenuItem> menus;
   final String initials;
   final String greeting;
   final String memberSince;
@@ -264,7 +365,7 @@ class _WelcomeCard extends StatelessWidget {
 }
 
 class _MenuCard extends StatelessWidget {
-  final _MenuItem item;
+  final SideMenuItem item;
   final VoidCallback onTap;
 
   const _MenuCard({required this.item, required this.onTap});
