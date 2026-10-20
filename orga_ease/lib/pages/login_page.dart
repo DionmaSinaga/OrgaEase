@@ -68,12 +68,12 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Masuk Akun', style: TextStyle(fontSize: 22,
-              fontWeight: FontWeight.w800, color: AppColors.textDark)),
+            Text('Masuk Akun', style: TextStyle(fontSize: 22,
+              fontWeight: FontWeight.w800, color: AppColors.ink(context))),
             const SizedBox(height: 4),
             Text('Silakan isi data di bawah ini', style: TextStyle(
               fontSize: 13,
-              color: AppColors.textDark.withValues(alpha: .6))),
+              color: AppColors.subInk(context))),
             const SizedBox(height: 20),
             AuthTextField(controller: _email, label: 'Email',
               hint: 'nama@email.com', prefixIcon: Icons.email_outlined,
@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
               suffixIcon: IconButton(
                 icon: Icon(_obsc ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
-                  color: AppColors.primaryTeal, size: 20),
+                  color: AppColors.secondary(context), size: 20),
                 onPressed: () => setState(() => _obsc = !_obsc)),
               validator: (v) {
                 if (v == null || v.isEmpty) return 'Sandi wajib diisi';
@@ -104,32 +104,35 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Row(mainAxisSize: MainAxisSize.min, children: [
                   Checkbox(value: _rem,
-                    activeColor: AppColors.primaryTeal,
+                    activeColor: AppColors.secondary(context),
                     onChanged: (v) =>
                       setState(() => _rem = v ?? false)),
-                  const Text('Ingat saya',
-                    style: TextStyle(fontSize: 13)),
+                  Text('Ingat saya',
+                    style: TextStyle(fontSize: 13,
+                      color: AppColors.ink(context))),
                 ]),
                 TextButton(onPressed: () {},
-                  child: const Text('Lupa sandi?',
-                    style: TextStyle(color: AppColors.primaryPink,
+                  child: Text('Lupa sandi?',
+                    style: TextStyle(color: AppColors.primary(context),
                       fontWeight: FontWeight.w600, fontSize: 13))),
               ]),
-            GradientButton(text: 'Masuk', isLoading: _load, onPressed: _login),
+            GradientButton(text: 'Masuk', isLoading: _load, onPressed: _login,
+              gradientColors: GradientButton.themeGradient(context)),
             const SizedBox(height: 14),
             // Wrap agar tidak overflow / newline aneh saat jendela sempit.
             Wrap(alignment: WrapAlignment.center,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                const Text('Belum punya akun? ',
-                  style: TextStyle(fontSize: 13)),
+                Text('Belum punya akun? ',
+                  style: TextStyle(fontSize: 13,
+                    color: AppColors.ink(context))),
                 GestureDetector(
                   onTap: () => Navigator.push(context, MaterialPageRoute(
                     builder: (_) => const RegisterPage())),
-                  child: const Text('Daftar',
+                  child: Text('Daftar',
                     style: TextStyle(fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.primaryPink))),
+                      color: AppColors.primary(context)))),
               ]),
           ],
         ),

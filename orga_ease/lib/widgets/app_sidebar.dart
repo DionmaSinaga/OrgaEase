@@ -10,6 +10,7 @@ class SideMenuItem {
 }
 
 /// Daftar kategori homepage utama.
+/// Warna tiap menu disesuaikan saat dipakai via [SideMenuColor.resolveColor].
 List<SideMenuItem> defaultSideMenus() => const [
       SideMenuItem('Beranda', Icons.dashboard_rounded, AppColors.primaryPink),
       SideMenuItem('Organisasi Saya', Icons.groups_rounded, AppColors.primaryPink),
@@ -18,8 +19,15 @@ List<SideMenuItem> defaultSideMenus() => const [
       SideMenuItem('Laporan', Icons.bar_chart_rounded, AppColors.primaryPink),
     ];
 
-/// Sidebar kiri Discord-style, menyatu dgn appbar (header gradient sama).
-///
+/// Warna menu yang sadar-tema: pink terang jadi pink lembut di dark mode.
+extension SideMenuColor on SideMenuItem {
+  Color resolveColor(BuildContext context) {
+    if (color == AppColors.primaryPink) return AppColors.primary(context);
+    if (color == AppColors.primaryTeal) return AppColors.secondary(context);
+    return color;
+  }
+}
+
 /// - Di layar lebar ([collapsed] mengatur minimize/expand seperti biasa).
 /// - Di dalam [Drawer] (layar sempit, [inDrawer] = true): SELALU tampil
 ///   expanded penuh berisi teks, walau sidebar desktop sedang minimize.
@@ -255,7 +263,7 @@ class _Tile extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(child: Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis,
             style: TextStyle(fontSize: 13.5, fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-              color: selected ? AppColors.textDark : const Color(0xFF475569)))),
+              color: selected ? AppColors.darkText : const Color(0xFF475569)))),
           if (selected) Container(width: 8, height: 8,
             decoration: BoxDecoration(color: item.color, shape: BoxShape.circle)),
         ]),
@@ -282,7 +290,7 @@ class _ManageGroup extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: hasActive ? AppColors.textDark.withValues(alpha: 0.05) : Colors.transparent,
+            color: hasActive ? AppColors.darkText.withValues(alpha: 0.05) : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(children: [
@@ -336,7 +344,7 @@ class _ProfileFooter extends StatelessWidget {
     if (!expanded) {
       return Container(
         decoration: const BoxDecoration(color: Color(0xFFF1F5F9),
-          border: Border(top: BorderSide(color: AppColors.cardGray))),
+          border: Border(top: BorderSide(color: AppColors.lightCard))),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         child: Column(children: [
           _avatar(),
@@ -350,14 +358,14 @@ class _ProfileFooter extends StatelessWidget {
     }
     return Container(
       decoration: const BoxDecoration(color: Color(0xFFF1F5F9),
-        border: Border(top: BorderSide(color: AppColors.cardGray))),
+        border: Border(top: BorderSide(color: AppColors.lightCard))),
       padding: const EdgeInsets.all(12),
       child: Row(children: [
         _avatar(),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
           Text(userName, maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppColors.textDark)),
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppColors.darkText)),
           Text(userEmail, maxLines: 1, overflow: TextOverflow.ellipsis,
             style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
           const Text('Online', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.success)),

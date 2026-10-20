@@ -38,15 +38,19 @@ class _AuthLayoutState extends State<AuthLayout> {
 
   @override
   Widget build(BuildContext context) {
+    final dark = AppColors.isDark(context);
+    final grad = dark
+        ? const [AppColors.darkPink, AppColors.darkTeal]
+        : const [AppColors.primaryPink, AppColors.primaryTeal];
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppColors.primaryPink, AppColors.primaryTeal],
+            colors: grad,
           ),
         ),
         child: Stack(
@@ -120,7 +124,7 @@ class _AuthLayoutState extends State<AuthLayout> {
                                       ],
                                     ),
                                     child: Icon(widget.icon, size: 32,
-                                      color: AppColors.primaryPink),
+                                      color: AppColors.primary(context)),
                                   ),
                                   const SizedBox(height: 14),
                                   Text(widget.title,

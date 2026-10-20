@@ -25,34 +25,35 @@ class AuthTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ink = AppColors.ink(context);
+    final hintColor = AppColors.subInk(context, 0.7);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(
+        Text(label, style: TextStyle(
           fontSize: 13.5, fontWeight: FontWeight.w600,
-          color: AppColors.textDark)),
+          color: ink)),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
           validator: validator,
-          style: const TextStyle(color: AppColors.textDark, fontSize: 14.5),
+          style: TextStyle(color: ink, fontSize: 14.5),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: AppColors.textDark.withValues(alpha: 0.4), fontSize: 14),
+              color: hintColor, fontSize: 14),
             prefixIcon: Icon(prefixIcon,
-              color: AppColors.primaryPink, size: 20),
+              color: AppColors.secondary(context), size: 20),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: AppColors.cardGray.withValues(alpha: 0.55),
+            fillColor: AppColors.field(context),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16, vertical: 15),
             border: _border(null),
-            enabledBorder: _border(
-              AppColors.textDark.withValues(alpha: 0.08)),
-            focusedBorder: _border(AppColors.primaryTeal, 1.6),
+            enabledBorder: _border(AppColors.fieldBorder(context)),
+            focusedBorder: _border(AppColors.secondary(context), 1.6),
             errorBorder: _border(AppColors.error),
             focusedErrorBorder: _border(AppColors.error, 1.6),
           ),

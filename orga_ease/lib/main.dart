@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
-import 'package:orga_ease/app_color.dart';
+import 'package:flutter/material.dart';
+import 'package:orga_ease/core/app_theme.dart';
 import 'package:orga_ease/core/app_window.dart';
+import 'package:orga_ease/core/theme_controller.dart';
 import 'package:orga_ease/pages/login_page.dart';
 
 void main() { runApp(const MyApp()); }
@@ -9,19 +10,20 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'OrgaEase',
-      theme: ThemeData(
-        scaffoldBackgroundColor: AppColors.backgroundWhite,
-        primaryColor: AppColors.primaryPink,
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryPink),
-        useMaterial3: true,
-      ),
-      builder: (context, child) =>
-          MinWindowGuard(child: child ?? const SizedBox.shrink()),
-      home: const LoginPage(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeController.mode,
+      builder: (context, mode, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'OrgaEase',
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          themeMode: mode,
+          builder: (context, child) =>
+              MinWindowGuard(child: child ?? const SizedBox.shrink()),
+          home: const LoginPage(),
+        );
+      },
     );
   }
 }
-

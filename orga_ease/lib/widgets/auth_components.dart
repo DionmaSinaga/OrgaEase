@@ -16,6 +16,18 @@ class GradientButton extends StatelessWidget {
       AppColors.primaryPink, AppColors.pinkHover],
   });
 
+  /// Gradien sadar-tema: pink->hover di light, darkPink->hover di dark.
+  static List<Color> themeGradient(BuildContext context) =>
+      AppColors.isDark(context)
+          ? const [AppColors.darkPink, AppColors.darkPinkHover]
+          : const [AppColors.primaryPink, AppColors.pinkHover];
+
+  /// Gradien teal sadar-tema (untuk tombol Daftar).
+  static List<Color> themeTealGradient(BuildContext context) =>
+      AppColors.isDark(context)
+          ? const [AppColors.darkTeal, AppColors.darkTealHover]
+          : const [AppColors.primaryTeal, AppColors.tealHover];
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -64,12 +76,12 @@ class AuthCard extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.all(pad),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.card(context),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.cardGray),
+            border: Border.all(color: AppColors.border(context)),
             boxShadow: [
               BoxShadow(
-                color: AppColors.textDark.withValues(alpha: 0.08),
+                color: AppColors.cardShadow(context),
                 blurRadius: 24, offset: const Offset(0, 10)),
             ],
           ),

@@ -71,11 +71,11 @@ class _RegisterPageState extends State<RegisterPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Daftar Akun', style: TextStyle(fontSize: 22,
-              fontWeight: FontWeight.w800, color: AppColors.textDark)),
+            Text('Daftar Akun', style: TextStyle(fontSize: 22,
+              fontWeight: FontWeight.w800, color: AppColors.ink(context))),
             const SizedBox(height: 4),
             Text('Lengkapi data di bawah ini', style: TextStyle(fontSize: 13,
-              color: AppColors.textDark.withValues(alpha: .6))),
+              color: AppColors.subInk(context))),
             const SizedBox(height: 18),
             AuthTextField(controller: _name, label: 'Nama',
               hint: 'Nama kamu', prefixIcon: Icons.person_outline,
@@ -92,7 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
               suffixIcon: IconButton(
                 icon: Icon(_o1 ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
-                  color: AppColors.primaryTeal, size: 20),
+                  color: AppColors.secondary(context), size: 20),
                 onPressed: () => setState(() => _o1 = !_o1)),
               validator: (v) => v!.length < 6 ? 'Minimal 6' : null),
             const SizedBox(height: 12),
@@ -102,32 +102,34 @@ class _RegisterPageState extends State<RegisterPage> {
               suffixIcon: IconButton(
                 icon: Icon(_o2 ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
-                  color: AppColors.primaryTeal, size: 20),
+                  color: AppColors.secondary(context), size: 20),
                 onPressed: () => setState(() => _o2 = !_o2)),
               validator: (v) => v != _pass.text ? 'Tidak sama' : null),
             Row(children: [
-              Checkbox(value: _agree, activeColor: AppColors.primaryTeal,
+              Checkbox(value: _agree,
+                activeColor: AppColors.secondary(context),
                 onChanged: (v) => setState(() => _agree = v ?? false)),
-              const Expanded(child: Text('Setuju S&K OrgaEase',
-                style: TextStyle(fontSize: 12.5))),
+              Expanded(child: Text('Setuju S&K OrgaEase',
+                style: TextStyle(fontSize: 12.5,
+                  color: AppColors.ink(context)))),
             ]),
             GradientButton(text: 'Daftar', isLoading: _load,
               onPressed: _reg,
-              gradientColors: const [
-                AppColors.primaryTeal, AppColors.tealHover]),
+              gradientColors: GradientButton.themeTealGradient(context)),
             const SizedBox(height: 12),
             // Wrap agar tidak overflow saat jendela disempitkan.
             Wrap(alignment: WrapAlignment.center,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                const Text('Sudah punya akun? ',
-                  style: TextStyle(fontSize: 13)),
+                Text('Sudah punya akun? ',
+                  style: TextStyle(fontSize: 13,
+                    color: AppColors.ink(context))),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
-                  child: const Text('Masuk',
+                  child: Text('Masuk',
                     style: TextStyle(fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.primaryPink))),
+                      color: AppColors.primary(context)))),
               ]),
           ],
         ),

@@ -4,6 +4,7 @@ import 'package:orga_ease/models/app_user.dart';
 import 'package:orga_ease/pages/login_page.dart';
 import 'package:orga_ease/widgets/auth_components.dart';
 import 'package:orga_ease/widgets/app_sidebar.dart';
+import 'package:orga_ease/widgets/theme_switch.dart';
 
 /// Homepage dgn sidebar kiri menyatu dgn appbar + bisa minimize.
 /// Sidebar berisi kategori homepage; bawah = profil ala Discord.
@@ -143,20 +144,20 @@ class _HomePageState extends State<HomePage> {
       if (narrow) {
         return Scaffold(
           key: _scaffoldKey,
-          backgroundColor: AppColors.backgroundWhite,
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           drawer: Drawer(width: _wExp, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero), child: _sidebar(inDrawer: true)),
           body: Column(children: [_topBar(true), Expanded(child: _content())]),
         );
       }
       return Scaffold(
-        backgroundColor: AppColors.backgroundWhite,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 220),
             curve: Curves.easeInOut,
             width: _collapsed ? _wCol : _wExp,
-            decoration: const BoxDecoration(color: Colors.white,
-              border: Border(right: BorderSide(color: AppColors.cardGray))),
+            decoration: BoxDecoration(color: AppColors.card(context),
+              border: Border(right: BorderSide(color: AppColors.border(context)))),
             // clipBehavior memotong sisa render 1 frame terakhir bila ada,
             // sehingga strip kuning "overflowed" tidak sempat terlihat.
             clipBehavior: Clip.hardEdge,
@@ -176,11 +177,15 @@ class _HomePageState extends State<HomePage> {
 
   Widget _topBar(bool narrow) {
     final cur = _menus[_selectedIndex];
+    final dark = AppColors.isDark(context);
+    final grad = dark
+        ? const [AppColors.darkPink, AppColors.darkTeal]
+        : const [AppColors.primaryPink, AppColors.primaryTeal];
     return Container(
       height: _topH,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
-          colors: [AppColors.primaryPink, AppColors.primaryTeal]),
+          colors: grad),
         boxShadow: [BoxShadow(color: Color(0x1A000000), blurRadius: 8, offset: Offset(0, 2))],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -200,10 +205,10 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10)),
-                child: const Text('OE',
+                child: Text('OE',
                     style: TextStyle(
                         fontWeight: FontWeight.w900,
-                        color: AppColors.primaryPink,
+                        color: AppColors.primary(context),
                         fontSize: 13)),
               ),
             ),
@@ -217,6 +222,9 @@ class _HomePageState extends State<HomePage> {
           if (!narrow) Text('$_greeting, ${widget.user.name}', maxLines: 1, overflow: TextOverflow.ellipsis,
             style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
         ])),
+        // Switchbox dark mode tepat di sebelah tombol notifikasi.
+        ThemeModeSwitch(compact: narrow),
+        const SizedBox(width: 6),
         IconButton(tooltip: 'Notifikasi', icon: const Icon(Icons.notifications_outlined, color: Colors.white),
           onPressed: () => _soon('Notifikasi')),
         const SizedBox(width: 4),
@@ -249,34 +257,36 @@ class _HomePageState extends State<HomePage> {
       );
     }
     final item = _menus[_selectedIndex];
+    final accent = item.resolveColor(context);
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       child: Center(child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 960),
         child: Container(
           padding: const EdgeInsets.all(28),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.cardGray),
-            boxShadow: [BoxShadow(color: AppColors.textDark.withValues(alpha: 0.06), blurRadius: 16, offset: const Offset(0, 8))]),
+          decoration: BoxDecoration(color: AppColors.card(context), borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.border(context)),
+            boxShadow: [BoxShadow(color: AppColors.cardShadow(context), blurRadius: 16, offset: const Offset(0, 8))]),
           child: Column(children: [
             Container(padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(color: item.color.withValues(alpha: 0.12), shape: BoxShape.circle),
-              child: Icon(item.icon, size: 36, color: item.color)),
+              decoration: BoxDecoration(color: accent.withValues(alpha: 0.14), shape: BoxShape.circle),
+              child: Icon(item.icon, size: 36, color: accent)),
             const SizedBox(height: 16),
             Text(item.label,
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textDark)),
+                    color: AppColors.ink(context))),
             const SizedBox(height: 8),
             Text('Halaman "${item.label}" segera hadir di OrgaEase. Untuk sekarang kamu bisa kembali ke Beranda.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 13.5, height: 1.5, color: AppColors.textDark.withValues(alpha: 0.65))),
+              style: TextStyle(fontSize: 13.5, height: 1.5, color: AppColors.subInk(context, 0.65))),
             const SizedBox(height: 20),
             SizedBox(width: 220, child: GradientButton(text: 'Kembali ke Beranda',
+              gradientColors: GradientButton.themeGradient(context),
               onPressed: () => setState(() => _selectedIndex = 0))),
           ]),
         ),
@@ -333,13 +343,12 @@ class _HomeBody extends StatelessWidget {
                       style: TextStyle(
                           fontSize: narrow ? 16 : 18,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.textDark)),
+                          color: AppColors.ink(context))),
                   const SizedBox(height: 4),
                   Text('Kelola organisasimu dari sini',
                       style: TextStyle(
                           fontSize: 13,
-                          color: AppColors.textDark
-                              .withValues(alpha: 0.6))),
+                          color: AppColors.subInk(context))),
                   const SizedBox(height: 14),
                   GridView.builder(
                     shrinkWrap: true,
@@ -390,18 +399,24 @@ class _WelcomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final dark = AppColors.isDark(context);
+    final grad = dark
+        ? const [AppColors.darkPink, AppColors.darkTeal]
+        : const [AppColors.primaryPink, AppColors.primaryTeal];
+    final shadowBase =
+        dark ? AppColors.darkPink : AppColors.primaryPink;
     return Container(
       padding: EdgeInsets.all(narrow ? 18 : 24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.primaryPink, AppColors.primaryTeal],
+          colors: grad,
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryPink.withValues(alpha: 0.25),
+            color: shadowBase.withValues(alpha: 0.25),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -450,16 +465,19 @@ class _MenuCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(20),
+      hoverColor: AppColors.primary(context).withValues(alpha: 0.06),
+      splashColor: AppColors.primary(context).withValues(alpha: 0.12),
+      highlightColor: AppColors.primary(context).withValues(alpha: 0.08),
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card(context),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.cardGray),
+          border: Border.all(color: AppColors.border(context)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.textDark.withValues(alpha: 0.06),
+              color: AppColors.cardShadow(context),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -471,20 +489,21 @@ class _MenuCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: item.color.withValues(alpha: 0.12),
+                color: item.resolveColor(context).withValues(alpha: 0.14),
                 shape: BoxShape.circle,
               ),
-              child: Icon(item.icon, size: 26, color: item.color),
+              child: Icon(item.icon,
+                  size: 26, color: item.resolveColor(context)),
             ),
             const SizedBox(height: 10),
             Text(item.label,
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textDark)),
+                    color: AppColors.ink(context))),
           ],
         ),
       ),
