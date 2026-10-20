@@ -31,9 +31,11 @@ class AppColors {
   static const Color pinkSoft = Color(0xFFFCE4F0);
   static const Color tealSoft = Color(0xFFDCF3F4);
   // Dark: hover = versi lebih terang agar kontras di atas gelap.
-  static const Color darkPinkHover = pinkHover; 
-  static const Color darkTealHover = tealHover; 
-  static const Color darkPinkSoft = Color(0xFF3A2A32);
+  static const Color darkPinkHover = pinkHover;
+  static const Color darkTealHover = tealHover;
+  // Soft dark: hijau-keabu netral (BUKAN pink) agar background
+  // menu/sidebar minimize tidak tampak kemerahan.
+  static const Color darkPinkSoft = Color(0xFF22393C);
   static const Color darkTealSoft = Color(0xFF1E3D40);
   // Isian field saat dark: sedikit lebih terang dari kartu.
   static const Color darkField = Color(0xFF22393C);

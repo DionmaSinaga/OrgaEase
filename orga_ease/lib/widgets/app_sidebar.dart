@@ -72,7 +72,11 @@ class AppSidebar extends StatelessWidget {
     // Drawer selalu expanded penuh (ada teks menu). Status minimize
     // (_collapsed) hanya berlaku untuk sidebar di layar lebar.
     final bool exp = inDrawer ? true : !collapsed;
-    return Column(
+    // Background sidebar eksplisit sama untuk minimize & full layar
+    // (AppColors.card): putih di light, darkCard di dark.
+    return Container(
+      color: AppColors.card(context),
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _Header(
@@ -136,6 +140,7 @@ class AppSidebar extends StatelessWidget {
           onLogout: onLogout,
         ),
       ],
+      ),
     );
   }
 }
@@ -165,7 +170,7 @@ class _Header extends StatelessWidget {
             child: Text('OE',
                 style: TextStyle(
                     fontWeight: FontWeight.w900,
-                    color: AppColors.primaryPink,
+                    color: AppColors.primary(context),
                     fontSize: fontSize)),
           ),
         ),
@@ -174,10 +179,10 @@ class _Header extends StatelessWidget {
 
     return Container(
       height: 64,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         // gradient: LinearGradient(
         //   begin: Alignment.topLeft, end: Alignment.bottomRight,
-          color: AppColors.primaryPink,
+        color: AppColors.primary(context),
         // ),
       ),
       padding: EdgeInsets.symmetric(horizontal: expanded ? 16 : 8, vertical: 10),
@@ -190,7 +195,7 @@ class _Header extends StatelessWidget {
               Container(
                 width: 38, height: 38, alignment: Alignment.center,
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                child: const Text('OE', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.primaryPink, fontSize: 15)),
+                child: Text('OE', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.primary(context), fontSize: 15)),
               ),
               const Spacer(flex: 1),
               const Text('OrgaEase', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 17)),
@@ -220,21 +225,24 @@ class _Tile extends StatelessWidget {
   const _Tile({required this.item, required this.selected, required this.expanded, this.subItem = false, required this.onTap});
   @override
   Widget build(BuildContext context) {
+    final accent = item.resolveColor(context);
     if (!expanded) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 6),
         child: Tooltip(
           message: item.label,
           child: InkWell(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(12),
+            hoverColor: accent.withValues(alpha: 0.08),
             onTap: onTap,
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                color: selected ? item.color.withValues(alpha: 0.14) : Colors.transparent,
-                borderRadius: BorderRadius.circular(14),
+                color: selected ? accent.withValues(alpha: 0.12) : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: selected ? accent.withValues(alpha: 0.22) : Colors.transparent),
               ),
-              child: Center(child: Icon(item.icon, color: selected ? item.color : const Color(0xFF64748B), size: 22)),
+              child: Center(child: Icon(item.icon, color: selected ? accent : AppColors.mutedIcon(context), size: 22)),
             ),
           ),
         ),
@@ -242,30 +250,31 @@ class _Tile extends StatelessWidget {
     }
     return InkWell(
       borderRadius: BorderRadius.circular(12),
+      hoverColor: accent.withValues(alpha: 0.08),
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: subItem ? 10 : 12, vertical: 10),
         margin: subItem ? const EdgeInsets.only(left: 22) : EdgeInsets.zero,
         decoration: BoxDecoration(
-          color: selected ? item.color.withValues(alpha: 0.12) : Colors.transparent,
+          color: selected ? accent.withValues(alpha: 0.12) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: selected ? item.color.withValues(alpha: 0.22) : Colors.transparent),
+          border: Border.all(color: selected ? accent.withValues(alpha: 0.22) : Colors.transparent),
         ),
         child: Row(children: [
           Container(
             padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
-              color: selected ? item.color.withValues(alpha: 0.16) : const Color(0xFFF1F5F9),
+              color: selected ? accent.withValues(alpha: 0.16) : AppColors.cardAlt(context),
               borderRadius: BorderRadius.circular(9),
             ),
-            child: Icon(item.icon, size: 18, color: selected ? item.color : const Color(0xFF64748B)),
+            child: Icon(item.icon, size: 18, color: selected ? accent : AppColors.mutedIcon(context)),
           ),
           const SizedBox(width: 10),
           Expanded(child: Text(item.label, maxLines: 1, overflow: TextOverflow.ellipsis,
             style: TextStyle(fontSize: 13.5, fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-              color: selected ? AppColors.darkText : const Color(0xFF475569)))),
+              color: selected ? AppColors.ink(context) : AppColors.subInk(context, 0.9)))),
           if (selected) Container(width: 8, height: 8,
-            decoration: BoxDecoration(color: item.color, shape: BoxShape.circle)),
+            decoration: BoxDecoration(color: accent, shape: BoxShape.circle)),
         ]),
       ),
     );
@@ -282,26 +291,38 @@ class _ManageGroup extends StatelessWidget {
   const _ManageGroup({required this.expanded, required this.isOpen, required this.hasActive, required this.onToggle, required this.children});
   @override
   Widget build(BuildContext context) {
+    final dark = AppColors.isDark(context);
+    // Saat minimize: header "Kelola" disembunyikan total agar tidak
+    // overflow; hanya isi menu (children = ikon) yang ditampilkan.
     if (!expanded) return Column(children: children);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       InkWell(
         borderRadius: BorderRadius.circular(12),
+        hoverColor: AppColors.primary(context).withValues(alpha: 0.08),
         onTap: onToggle,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: hasActive ? AppColors.darkText.withValues(alpha: 0.05) : Colors.transparent,
+            color: hasActive
+                ? (dark
+                    ? Colors.white.withValues(alpha: 0.06)
+                    : AppColors.lightText.withValues(alpha: 0.05))
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(children: [
             Container(padding: const EdgeInsets.all(7),
-              decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(9)),
-              child: const Icon(Icons.folder_open_rounded, size: 18, color: Color(0xFF64748B))),
+              decoration: BoxDecoration(
+                  color: AppColors.cardAlt(context),
+                  borderRadius: BorderRadius.circular(9)),
+              child: Icon(Icons.folder_open_rounded,
+                  size: 18, color: AppColors.mutedIcon(context))),
             const SizedBox(width: 10),
-            const Expanded(child: Text('Kelola',
-              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Color(0xFF475569)))),
+            Expanded(child: Text('Kelola',
+              style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700,
+                  color: AppColors.subInk(context, 0.9)))),
             AnimatedRotation(turns: isOpen ? 0.5 : 0, duration: const Duration(milliseconds: 200),
-              child: const Icon(Icons.expand_more_rounded, size: 20, color: Color(0xFF94A3B8))),
+              child: Icon(Icons.expand_more_rounded, size: 20, color: AppColors.mutedIcon(context))),
           ]),
         ),
       ),
@@ -324,54 +345,56 @@ class _ProfileFooter extends StatelessWidget {
   final VoidCallback onSettings;
   final VoidCallback onLogout;
   const _ProfileFooter({required this.expanded, required this.userName, required this.userEmail, required this.initials, required this.onSettings, required this.onLogout});
-  Widget _avatar() {
+  Widget _avatar(BuildContext context) {
     return Stack(children: [
       Container(
         width: 42, height: 42, alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [AppColors.primaryPink, AppColors.primaryTeal]),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: [AppColors.primary(context), AppColors.secondary(context)]),
           shape: BoxShape.circle,
         ),
         child: Text(initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
       ),
       Positioned(right: 0, bottom: 0, child: Container(width: 12, height: 12,
         decoration: BoxDecoration(color: AppColors.success, shape: BoxShape.circle,
-          border: Border.all(color: Colors.white, width: 2)))),
+          border: Border.all(color: AppColors.card(context), width: 2)))),
     ]);
   }
   @override
   Widget build(BuildContext context) {
+    final footerBg = AppColors.cardAlt(context);
+    final footerBorder = AppColors.border(context);
     if (!expanded) {
       return Container(
-        decoration: const BoxDecoration(color: Color(0xFFF1F5F9),
-          border: Border(top: BorderSide(color: AppColors.lightCard))),
+        decoration: BoxDecoration(color: footerBg,
+          border: Border(top: BorderSide(color: footerBorder))),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         child: Column(children: [
-          _avatar(),
+          _avatar(context),
           const SizedBox(height: 8),
           IconButton(tooltip: 'Pengaturan', icon: const Icon(Icons.settings_outlined, size: 20),
-            color: const Color(0xFF64748B), onPressed: onSettings),
+            color: AppColors.mutedIcon(context), onPressed: onSettings),
           IconButton(tooltip: 'Keluar', icon: const Icon(Icons.logout_rounded, size: 20),
             color: AppColors.error, onPressed: onLogout),
         ]),
       );
     }
     return Container(
-      decoration: const BoxDecoration(color: Color(0xFFF1F5F9),
-        border: Border(top: BorderSide(color: AppColors.lightCard))),
+      decoration: BoxDecoration(color: footerBg,
+        border: Border(top: BorderSide(color: footerBorder))),
       padding: const EdgeInsets.all(12),
       child: Row(children: [
-        _avatar(),
+        _avatar(context),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
           Text(userName, maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppColors.darkText)),
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppColors.ink(context))),
           Text(userEmail, maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
+            style: TextStyle(fontSize: 11.5, color: AppColors.mutedIcon(context))),
           const Text('Online', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.success)),
         ])),
         IconButton(tooltip: 'Pengaturan', icon: const Icon(Icons.settings_outlined, size: 20),
-          color: const Color(0xFF64748B), onPressed: onSettings),
+          color: AppColors.mutedIcon(context), onPressed: onSettings),
         IconButton(tooltip: 'Keluar', icon: const Icon(Icons.logout_rounded, size: 20),
           color: AppColors.error, onPressed: onLogout),
       ]),
