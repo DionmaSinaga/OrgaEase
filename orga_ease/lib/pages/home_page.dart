@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:orga_ease/app_color.dart';
 import 'package:orga_ease/models/app_user.dart';
 import 'package:orga_ease/pages/login_page.dart';
+import 'package:orga_ease/pages/my_organizations_page.dart';
 import 'package:orga_ease/widgets/auth_components.dart';
 import 'package:orga_ease/widgets/app_sidebar.dart';
 import 'package:orga_ease/widgets/theme_switch.dart';
@@ -255,6 +256,12 @@ class _HomePageState extends State<HomePage> {
         },
       );
     }
+
+    // Halaman "Organisasi Saya" (menu sidebar ke-2).
+    if (_selectedIndex == 1) {
+      return MyOrganizationsPage(user: widget.user);
+    }
+
     final item = _menus[_selectedIndex];
     final accent = item.resolveColor(context);
     return SingleChildScrollView(

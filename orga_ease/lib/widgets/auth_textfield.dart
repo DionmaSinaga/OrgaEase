@@ -10,6 +10,9 @@ class AuthTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
+  final bool enabled;
+  final int maxLines;
+  final ValueChanged<String>? onChanged;
 
   const AuthTextField({
     super.key,
@@ -21,6 +24,9 @@ class AuthTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.validator,
+    this.enabled = true,
+    this.maxLines = 1,
+    this.onChanged,
   });
 
   @override
@@ -39,6 +45,9 @@ class AuthTextField extends StatelessWidget {
           obscureText: obscureText,
           keyboardType: keyboardType,
           validator: validator,
+          enabled: enabled,
+          maxLines: maxLines,
+          onChanged: onChanged,
           style: TextStyle(color: ink, fontSize: 14.5),
           decoration: InputDecoration(
             hintText: hint,
