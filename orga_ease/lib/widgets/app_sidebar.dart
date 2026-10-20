@@ -220,7 +220,6 @@ class _Tile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = AppColors.primaryColor;
-    // Sorotan kuning hanya untuk dot/section aktif.
     const spot = AppColors.secondaryColor;
     if (!expanded) {
       return Padding(
@@ -300,7 +299,13 @@ class _ManageGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     // Saat minimize: header "Kelola" disembunyikan total agar tidak
     // overflow; hanya isi menu (children = ikon) yang ditampilkan.
-    if (!expanded) return Column(children: children);
+    // Stretch agar border menu aktif selebar tile Beranda (full-width),
+    // bukan menyusut fit dengan ikon.
+    if (!expanded) {
+      return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: children);
+    }
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       InkWell(
         borderRadius: BorderRadius.circular(12),
