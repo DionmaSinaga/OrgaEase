@@ -13,20 +13,20 @@ class GradientButton extends StatelessWidget {
     required this.onPressed,
     this.isLoading = false,
     this.gradientColors = const [
-      AppColors.primaryPink, AppColors.pinkHover],
+      AppColors.primaryColor, AppColors.primaryHover],
   });
 
-  /// Gradien sadar-tema: pink->hover di light, darkPink->hover di dark.
+  /// Gradien ungu utama (Masuk): primary -> hover, ikut tema.
   static List<Color> themeGradient(BuildContext context) =>
       AppColors.isDark(context)
-          ? const [AppColors.darkPink, AppColors.darkPinkHover]
-          : const [AppColors.primaryPink, AppColors.pinkHover];
+          ? const [AppColors.primaryColor, AppColors.primaryHoverDark]
+          : const [AppColors.primaryColor, AppColors.primaryHover];
 
-  /// Gradien teal sadar-tema (untuk tombol Daftar).
+  /// Gradien tombol Daftar: hover -> primary (kebalikan Masuk).
   static List<Color> themeTealGradient(BuildContext context) =>
       AppColors.isDark(context)
-          ? const [AppColors.darkTeal, AppColors.darkTealHover]
-          : const [AppColors.primaryTeal, AppColors.tealHover];
+          ? const [AppColors.primaryHoverDark, AppColors.primaryColor]
+          : const [AppColors.primaryHover, AppColors.primaryColor];
 
   @override
   Widget build(BuildContext context) {

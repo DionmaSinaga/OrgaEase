@@ -45,7 +45,7 @@ class AuthTextField extends StatelessWidget {
             hintStyle: TextStyle(
               color: hintColor, fontSize: 14),
             prefixIcon: Icon(prefixIcon,
-              color: AppColors.secondary(context), size: 20),
+              color: AppColors.primary(context), size: 20),
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: AppColors.field(context),
@@ -53,7 +53,7 @@ class AuthTextField extends StatelessWidget {
               horizontal: 16, vertical: 15),
             border: _border(null),
             enabledBorder: _border(AppColors.fieldBorder(context)),
-            focusedBorder: _border(AppColors.secondary(context), 1.6),
+            focusedBorder: _border(AppColors.primary(context), 1.6),
             errorBorder: _border(AppColors.error),
             focusedErrorBorder: _border(AppColors.error, 1.6),
           ),

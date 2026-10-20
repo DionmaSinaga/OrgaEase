@@ -177,15 +177,13 @@ class _HomePageState extends State<HomePage> {
 
   Widget _topBar(bool narrow) {
     final cur = _menus[_selectedIndex];
-    final dark = AppColors.isDark(context);
-    final grad = dark
-        ? const [AppColors.darkPink, AppColors.darkTeal]
-        : const [AppColors.primaryPink, AppColors.primaryTeal];
     return Container(
       height: _topH,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
-          colors: grad),
+      decoration: const BoxDecoration(
+        // Referensi: #834DFB -> #E3D7FF, teks darkPrimary.
+        gradient: LinearGradient(
+          begin: Alignment.topLeft, end: Alignment.bottomRight,
+          colors: AppColors.headerGradient),
         boxShadow: [BoxShadow(color: Color(0x1A000000), blurRadius: 8, offset: Offset(0, 2))],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -203,29 +201,30 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 width: 36, height: 36, alignment: Alignment.center,
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.onHeaderText,
                     borderRadius: BorderRadius.circular(10)),
-                child: Text('OE',
+                child: const Text('OE',
                     style: TextStyle(
                         fontWeight: FontWeight.w900,
-                        color: AppColors.primary(context),
+                        color: Colors.white,
                         fontSize: 13)),
               ),
             ),
           ),
         if (narrow) const SizedBox(width: 10),
-        Icon(cur.icon, color: Colors.white, size: 22),
+        const Icon(Icons.dashboard_rounded,
+            color: AppColors.onHeaderText, size: 22),
         const SizedBox(width: 10),
         Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(cur.label, maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
+            style: const TextStyle(color: AppColors.onHeaderText, fontSize: 17, fontWeight: FontWeight.w800)),
           if (!narrow) Text('$_greeting, ${widget.user.name}', maxLines: 1, overflow: TextOverflow.ellipsis,
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 12)),
+            style: TextStyle(color: AppColors.onHeaderSubtext(), fontSize: 12)),
         ])),
         // Switchbox dark mode tepat di sebelah tombol notifikasi.
         ThemeModeSwitch(compact: narrow),
         const SizedBox(width: 6),
-        IconButton(tooltip: 'Notifikasi', icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+        IconButton(tooltip: 'Notifikasi', icon: const Icon(Icons.notifications_outlined, color: AppColors.onHeaderText),
           onPressed: () => _soon('Notifikasi')),
         const SizedBox(width: 4),
         // Container(width: 36, height: 36, alignment: Alignment.center,
@@ -399,26 +398,21 @@ class _WelcomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = AppColors.isDark(context);
-    final grad = dark
-        ? const [AppColors.darkPink, AppColors.darkTeal]
-        : const [AppColors.primaryPink, AppColors.primaryTeal];
-    final shadowBase =
-        dark ? AppColors.darkPink : AppColors.primaryPink;
     return Container(
       padding: EdgeInsets.all(narrow ? 18 : 24),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
+        // Banner: gradien header #834DFB -> #E3D7FF, teks darkPrimary.
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: grad,
+          colors: AppColors.headerGradient,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.all(Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: shadowBase.withValues(alpha: 0.25),
+            color: Color(0x40834DFB),
             blurRadius: 20,
-            offset: const Offset(0, 10),
+            offset: Offset(0, 10),
           ),
         ],
       ),
@@ -465,13 +459,14 @@ class _MenuCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(20),
-      hoverColor: AppColors.primary(context).withValues(alpha: 0.06),
-      splashColor: AppColors.primary(context).withValues(alpha: 0.12),
-      highlightColor: AppColors.primary(context).withValues(alpha: 0.08),
+      hoverColor: AppColors.primaryColor.withValues(alpha: 0.08),
+      splashColor: AppColors.primaryColor.withValues(alpha: 0.14),
+      highlightColor: AppColors.primaryColor.withValues(alpha: 0.10),
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
+          // Card main menu: putih (light) / darkCard (dark).
           color: AppColors.card(context),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: AppColors.border(context)),
@@ -489,11 +484,14 @@ class _MenuCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: item.resolveColor(context).withValues(alpha: 0.14),
+                color: AppColors.primaryColor.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.primaryColor.withValues(alpha: 0.25),
+                ),
               ),
               child: Icon(item.icon,
-                  size: 26, color: item.resolveColor(context)),
+                  size: 26, color: AppColors.primaryColor),
             ),
             const SizedBox(height: 10),
             Text(item.label,
@@ -522,9 +520,9 @@ class _Avatar extends StatelessWidget {
       height: 72,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.25),
+        color: AppColors.onHeaderText.withValues(alpha: 0.85),
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
+        border: Border.all(color: AppColors.secondaryColor, width: 2),
       ),
       child: Text(initials,
           style: const TextStyle(
@@ -563,7 +561,7 @@ class _WelcomeText extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withValues(alpha: 0.9))),
+                color: AppColors.onHeaderSubtext(0.85))),
         Text(name,
             textAlign: align,
             maxLines: 2,
@@ -571,7 +569,7 @@ class _WelcomeText extends StatelessWidget {
             style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
-                color: Colors.white)),
+                color: AppColors.onHeaderText)),
         const SizedBox(height: 4),
         Text(email,
             textAlign: align,
@@ -579,7 +577,7 @@ class _WelcomeText extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
                 fontSize: 13,
-                color: Colors.white.withValues(alpha: 0.9))),
+                color: AppColors.onHeaderSubtext(0.85))),
         const SizedBox(height: 2),
         Text('Anggota sejak $memberSince',
             maxLines: 1,
@@ -587,7 +585,7 @@ class _WelcomeText extends StatelessWidget {
             textAlign: align,
             style: TextStyle(
                 fontSize: 12,
-                color: Colors.white.withValues(alpha: 0.8))),
+                color: AppColors.onHeaderSubtext(0.75))),
       ],
     );
   }

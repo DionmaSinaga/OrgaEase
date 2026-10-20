@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
               suffixIcon: IconButton(
                 icon: Icon(_obsc ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
-                  color: AppColors.secondary(context), size: 20),
+                  color: AppColors.primary(context), size: 20),
                 onPressed: () => setState(() => _obsc = !_obsc)),
               validator: (v) {
                 if (v == null || v.isEmpty) return 'Sandi wajib diisi';
@@ -104,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Row(mainAxisSize: MainAxisSize.min, children: [
                   Checkbox(value: _rem,
-                    activeColor: AppColors.secondary(context),
+                    activeColor: AppColors.primary(context),
                     onChanged: (v) =>
                       setState(() => _rem = v ?? false)),
                   Text('Ingat saya',

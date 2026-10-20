@@ -92,7 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
               suffixIcon: IconButton(
                 icon: Icon(_o1 ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
-                  color: AppColors.secondary(context), size: 20),
+                  color: AppColors.primary(context), size: 20),
                 onPressed: () => setState(() => _o1 = !_o1)),
               validator: (v) => v!.length < 6 ? 'Minimal 6' : null),
             const SizedBox(height: 12),
@@ -102,12 +102,12 @@ class _RegisterPageState extends State<RegisterPage> {
               suffixIcon: IconButton(
                 icon: Icon(_o2 ? Icons.visibility_off_outlined
                   : Icons.visibility_outlined,
-                  color: AppColors.secondary(context), size: 20),
+                  color: AppColors.primary(context), size: 20),
                 onPressed: () => setState(() => _o2 = !_o2)),
               validator: (v) => v != _pass.text ? 'Tidak sama' : null),
             Row(children: [
               Checkbox(value: _agree,
-                activeColor: AppColors.secondary(context),
+                activeColor: AppColors.primary(context),
                 onChanged: (v) => setState(() => _agree = v ?? false)),
               Expanded(child: Text('Setuju S&K OrgaEase',
                 style: TextStyle(fontSize: 12.5,

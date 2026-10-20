@@ -3,7 +3,7 @@ import 'package:orga_ease/app_color.dart';
 import 'package:orga_ease/core/theme_controller.dart';
 
 /// Switchbox pengubah terang/gelap, dipasang di sebelah tombol notifikasi.
-/// Ikon matahari/bulan mengikuti status; Switch memakai warna tema.
+/// Ikon matahari/bulan mengikuti status; thumb kuning saat dark.
 class ThemeModeSwitch extends StatelessWidget {
   final bool compact;
   const ThemeModeSwitch({super.key, this.compact = false});
@@ -14,7 +14,6 @@ class ThemeModeSwitch extends StatelessWidget {
       valueListenable: ThemeController.mode,
       builder: (context, mode, _) {
         final isDark = mode == ThemeMode.dark;
-        final thumb = isDark ? AppColors.darkPink : Colors.white;
         return Tooltip(
           message: isDark ? 'Mode gelap aktif' : 'Mode terang aktif',
           child: Container(
@@ -23,10 +22,10 @@ class ThemeModeSwitch extends StatelessWidget {
               vertical: 4,
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.22),
+              color: AppColors.onHeaderText.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.45),
+                color: AppColors.onHeaderText.withValues(alpha: 0.25),
               ),
             ),
             child: Row(
@@ -34,7 +33,7 @@ class ThemeModeSwitch extends StatelessWidget {
               children: [
                 Icon(
                   isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                  color: Colors.white,
+                  color: AppColors.onHeaderText,
                   size: 16,
                 ),
                 const SizedBox(width: 4),
@@ -46,12 +45,12 @@ class ThemeModeSwitch extends StatelessWidget {
                     child: Switch(
                       value: isDark,
                       onChanged: ThemeController.setDark,
-                      activeThumbColor: thumb,
-                      activeTrackColor:
-                          AppColors.lightText.withValues(alpha: 0.55),
+                      activeThumbColor: AppColors.secondaryColor,
+                      activeTrackColor: AppColors.onHeaderText
+                          .withValues(alpha: 0.55),
                       inactiveThumbColor: Colors.white,
-                      inactiveTrackColor:
-                          Colors.white.withValues(alpha: 0.35),
+                      inactiveTrackColor: AppColors.onHeaderText
+                          .withValues(alpha: 0.30),
                       materialTapTargetSize:
                           MaterialTapTargetSize.shrinkWrap,
                     ),

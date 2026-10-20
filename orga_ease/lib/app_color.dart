@@ -1,76 +1,62 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Warna Fondasi Utama Anda
-  static const Color primaryPink = Color(0xFFDE539D);
-  static const Color primaryTeal = Color(0xFF4EBFC1);
-  static const Color lightBackground = Color(0xFFF9FDFD);
-  static const Color lightCard = Color(0xFFEAEFF2);
-  static const Color lightText = Color(0xFF0E1A1A);
-  static const Color lightSubtext = Color(0xFF526363);
-  static const Color lightBorder = Color(0xFFE0EBEB);
+  // === Fondasi utama (milik Anda, jangan diubah nilainya) ===
+  static const Color primaryColor = Color(0xFF834DFB);
+  static const Color secondaryColor = Color(0xFFFBD100);
+  static const Color darkPrimary = Color(0xFF18102B);
+  static const Color lightPrimary = Color(0xFFF6F3FF);
 
-  // Palet Dark Mode
-  static const Color darkPink = primaryPink; // tetap sama, tapi bisa diganti jika mau
-  static const Color darkTeal = primaryTeal; // tetap sama, tapi bisa diganti jika mau
-  static const Color darkBackground = Color(0xFF121E1F);
-  static const Color darkCard = Color(0xFF1A2C2E);
-  static const Color darkText = Color(0xFFE0F2F1);
-  static const Color darkSubtext = Color(0xFF94A8A8);
-  static const Color darkBorder = Color(0xFF2A3F41);
+  // === Turunan yang saya sesuaikan ke fondasi ===
+  // Ungu akhir gradien login (lebih pekat dari primary).
+  static const Color loginDeep = Color(0xFF200659);
+  // Ungu muda akhir gradasi header/sidebar + gradien login.
+  static const Color lavenderMist = Color(0xFFE3D7FF);
+  // Hover ungu: lebih gelap (light) / lebih terang (dark).
+  static const Color primaryHover = Color(0xFF6B31E8);
+  static const Color primaryHoverDark = Color(0xFF9B6BFF);
+
+  // Teks & ikon mengikuti tema.
+  static const Color lightText = Color(0xFF221A3A);
+  static const Color lightSubtext = Color(0xFF6B6390);
+  static const Color lightBorder = Color(0xFFE2D9F7);
+  static const Color darkText = Color(0xFFF1EBFF);
+  static const Color darkSubtext = Color(0xFFB3A8D6);
+  static const Color darkBorder = Color(0xFF342A55);
+
+  // Permukaan kartu: terang = putih di atas lightPrimary,
+  // gelap = darkPrimary yang sedikit diangkat agar beda dari bg.
+  static const Color lightCard = Colors.white;
+  static const Color darkCard = Color(0xFF221839);
+  static const Color darkCardAlt = Color(0xFF2B1F47);
 
   // Fungsional
   static const Color success = Color(0xFF2ECC71);
   static const Color warning = Color(0xFFF1C40F);
   static const Color error = Color(0xFFE74C3C);
 
-  // --- Varian hover / tekan / lembut (saya sesuaikan dari palet Anda) ---
-  // Light: hover = versi lebih gelap agar kontras di atas terang.
-  static const Color pinkHover = Color(0xFFB8387C);
-  static const Color tealHover = Color(0xFF389A9C);
-  static const Color pinkSoft = Color(0xFFFCE4F0);
-  static const Color tealSoft = Color(0xFFDCF3F4);
-  // Dark: hover = versi lebih terang agar kontras di atas gelap.
-  static const Color darkPinkHover = pinkHover;
-  static const Color darkTealHover = tealHover;
-  // Soft dark: hijau-keabu netral (BUKAN pink) agar background
-  // menu/sidebar minimize tidak tampak kemerahan.
-  static const Color darkPinkSoft = Color(0xFF22393C);
-  static const Color darkTealSoft = Color(0xFF1E3D40);
-  // Isian field saat dark: sedikit lebih terang dari kartu.
-  static const Color darkField = Color(0xFF22393C);
-
   // --- Helper sadar-tema ---
   static bool isDark(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark;
 
-  /// Aksen utama mengikuti tema (pink terang / pink lembut di dark).
-  static Color primary(BuildContext context) =>
-      isDark(context) ? darkPink : primaryPink;
+  /// Aksen utama (ungu) — sama di kedua tema agar brand konsisten.
+  static Color primary(BuildContext context) => primaryColor;
 
-  static Color secondary(BuildContext context) =>
-      isDark(context) ? darkTeal : primaryTeal;
+  static Color primaryHoverOf(BuildContext context) =>
+      isDark(context) ? primaryHoverDark : primaryHover;
 
-  static Color primaryHover(BuildContext context) =>
-      isDark(context) ? darkPinkHover : pinkHover;
+  /// Sorotan kuning — dipakai hemat: dot menu aktif, aksen kecil.
+  static Color highlight(BuildContext context) => secondaryColor;
 
-  static Color secondaryHover(BuildContext context) =>
-      isDark(context) ? darkTealHover : tealHover;
+  /// Background halaman utama: lightPrimary / darkPrimary.
+  static Color page(BuildContext context) =>
+      isDark(context) ? darkPrimary : lightPrimary;
 
-  static Color primarySoft(BuildContext context) =>
-      isDark(context) ? darkPinkSoft : pinkSoft;
-
-  static Color secondarySoft(BuildContext context) =>
-      isDark(context) ? darkTealSoft : tealSoft;
-
-  /// Permukaan kartu: putih di light (kontras dgn lightBackground),
-  /// darkCard di dark.
   static Color card(BuildContext context) =>
-      isDark(context) ? darkCard : Colors.white;
+      isDark(context) ? darkCard : lightCard;
 
-  /// Permukaan alternatif (footer sidebar, chip ikon, dsb).
   static Color cardAlt(BuildContext context) =>
-      isDark(context) ? darkField : lightCard;
+      isDark(context) ? darkCardAlt : const Color(0xFFEDE7FB);
 
   static Color border(BuildContext context) =>
       isDark(context) ? darkBorder : lightBorder;
@@ -78,23 +64,43 @@ class AppColors {
   static Color ink(BuildContext context) =>
       isDark(context) ? darkText : lightText;
 
-  static Color subInk(BuildContext context, [double alpha = 0.6]) =>
+  static Color subInk(BuildContext context, [double alpha = 0.75]) =>
       (isDark(context) ? darkSubtext : lightSubtext)
           .withValues(alpha: alpha);
 
   static Color mutedIcon(BuildContext context) =>
       isDark(context) ? darkSubtext : lightSubtext;
 
-  /// Isian TextField.
-  static Color field(BuildContext context) =>
-      isDark(context) ? darkField : lightCard.withValues(alpha: 0.6);
+  static Color field(BuildContext context) => isDark(context)
+      ? darkCardAlt
+      : Colors.white;
 
-  static Color fieldBorder(BuildContext context) =>
-      isDark(context) ? darkBorder : lightText.withValues(alpha: 0.08);
+  static Color fieldBorder(BuildContext context) => isDark(context)
+      ? darkBorder
+      : lightBorder;
 
-  /// Warna bayangan kartu.
   static Color cardShadow(BuildContext context) => isDark(context)
-      ? Colors.black.withValues(alpha: 0.35)
-      : lightText.withValues(alpha: 0.07);
+      ? Colors.black.withValues(alpha: 0.45)
+      : const Color(0xFF834DFB).withValues(alpha: 0.10);
+
+  // === Gradien sesuai referensi ===
+  /// Login: #200659 -> #834DFB -> #E3D7FF (selalu sama, tidak ikut tema).
+  static const List<Color> loginGradient = [
+    loginDeep,
+    primaryColor,
+    lavenderMist,
+  ];
+
+  /// Header homepage & sidebar: #834DFB -> #E3D7FF (selalu sama).
+  static const List<Color> headerGradient = [
+    primaryColor,
+    lavenderMist,
+  ];
+
+  /// Teks di atas gradien header: darkPrimary (sesuai referensi).
+  static const Color onHeaderText = darkPrimary;
+  static Color onHeaderSubtext([double alpha = 0.72]) =>
+      darkPrimary.withValues(alpha: alpha);
 }
+
 

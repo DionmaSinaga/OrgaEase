@@ -9,23 +9,19 @@ class SideMenuItem {
   const SideMenuItem(this.label, this.icon, this.color);
 }
 
-/// Daftar kategori homepage utama.
-/// Warna tiap menu disesuaikan saat dipakai via [SideMenuColor.resolveColor].
+/// Daftar kategori homepage utama (semua ikon netral; aksen via secondary).
 List<SideMenuItem> defaultSideMenus() => const [
-      SideMenuItem('Beranda', Icons.dashboard_rounded, AppColors.primaryPink),
-      SideMenuItem('Organisasi Saya', Icons.groups_rounded, AppColors.primaryPink),
-      SideMenuItem('Kegiatan', Icons.event_note_rounded, AppColors.primaryPink),
-      SideMenuItem('Anggota', Icons.person_outline_rounded, AppColors.primaryPink),
-      SideMenuItem('Laporan', Icons.bar_chart_rounded, AppColors.primaryPink),
+      SideMenuItem('Beranda', Icons.dashboard_rounded, AppColors.primaryColor),
+      SideMenuItem('Organisasi Saya', Icons.groups_rounded, AppColors.primaryColor),
+      SideMenuItem('Kegiatan', Icons.event_note_rounded, AppColors.primaryColor),
+      SideMenuItem('Anggota', Icons.person_outline_rounded, AppColors.primaryColor),
+      SideMenuItem('Laporan', Icons.bar_chart_rounded, AppColors.primaryColor),
     ];
 
-/// Warna menu yang sadar-tema: pink terang jadi pink lembut di dark mode.
+/// Aksen menu: ungu primary di kedua tema; sorotan kuning hanya
+/// untuk dot/penanda aktif (lihat [_Tile]).
 extension SideMenuColor on SideMenuItem {
-  Color resolveColor(BuildContext context) {
-    if (color == AppColors.primaryPink) return AppColors.primary(context);
-    if (color == AppColors.primaryTeal) return AppColors.secondary(context);
-    return color;
-  }
+  Color resolveColor(BuildContext context) => AppColors.primaryColor;
 }
 
 /// - Di layar lebar ([collapsed] mengatur minimize/expand seperti biasa).
@@ -165,12 +161,12 @@ class _Header extends StatelessWidget {
             height: 38,
             alignment: Alignment.center,
             decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.onHeaderText,
                 borderRadius: BorderRadius.circular(12)),
             child: Text('OE',
                 style: TextStyle(
                     fontWeight: FontWeight.w900,
-                    color: AppColors.primary(context),
+                    color: Colors.white,
                     fontSize: fontSize)),
           ),
         ),
@@ -179,12 +175,10 @@ class _Header extends StatelessWidget {
 
     return Container(
       height: 64,
-      decoration: BoxDecoration(
-        // gradient: LinearGradient(
-        //   begin: Alignment.topLeft, end: Alignment.bottomRight,
-        color: AppColors.primary(context),
-        // ),
-      ),
+      decoration: const BoxDecoration(
+        // Referensi sidebar: #834DFB -> #E3D7FF (sama dgn topbar).
+          color: AppColors.primaryColor),
+
       padding: EdgeInsets.symmetric(horizontal: expanded ? 16 : 8, vertical: 10),
       // Clip agar Row expanded tidak overflow sesaat saat AnimatedContainer
       // masih di tengah animasi 80 <-> 264px.
@@ -194,16 +188,16 @@ class _Header extends StatelessWidget {
               // Logo statis saat sidebar terbuka (tombol buka tidak perlu).
               Container(
                 width: 38, height: 38, alignment: Alignment.center,
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                child: Text('OE', style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.primary(context), fontSize: 15)),
+                decoration: BoxDecoration(color: AppColors.onHeaderText, borderRadius: BorderRadius.circular(12)),
+                child: const Text('OE', style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 15)),
               ),
               const Spacer(flex: 1),
-              const Text('OrgaEase', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 17)),
+              const Text('OrgaEase', style: TextStyle(color: AppColors.onHeaderText, fontWeight: FontWeight.w700, fontSize: 17)),
               const Spacer(flex: 3),
               // Panah ke kiri = tutup / minimize sidebar.
               IconButton(
                 tooltip: onClose != null ? 'Tutup menu' : 'Tutup sidebar',
-                icon: const Icon(Icons.chevron_left_rounded, color: Colors.white, size: 28),
+                icon: const Icon(Icons.chevron_left_rounded, color: AppColors.onHeaderText, size: 28),
                 onPressed: onClose ?? onToggle,
               ),
             ])
@@ -225,7 +219,9 @@ class _Tile extends StatelessWidget {
   const _Tile({required this.item, required this.selected, required this.expanded, this.subItem = false, required this.onTap});
   @override
   Widget build(BuildContext context) {
-    final accent = item.resolveColor(context);
+    final accent = AppColors.primaryColor;
+    // Sorotan kuning hanya untuk dot/section aktif.
+    const spot = AppColors.secondaryColor;
     if (!expanded) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 6),
@@ -242,7 +238,18 @@ class _Tile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: selected ? accent.withValues(alpha: 0.22) : Colors.transparent),
               ),
-              child: Center(child: Icon(item.icon, color: selected ? accent : AppColors.mutedIcon(context), size: 22)),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(item.icon, color: selected ? accent : AppColors.mutedIcon(context), size: 22),
+                  if (selected)
+                    Positioned(
+                      bottom: 6,
+                      child: Container(width: 6, height: 6,
+                        decoration: const BoxDecoration(color: spot, shape: BoxShape.circle)),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -274,7 +281,7 @@ class _Tile extends StatelessWidget {
             style: TextStyle(fontSize: 13.5, fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
               color: selected ? AppColors.ink(context) : AppColors.subInk(context, 0.9)))),
           if (selected) Container(width: 8, height: 8,
-            decoration: BoxDecoration(color: accent, shape: BoxShape.circle)),
+            decoration: const BoxDecoration(color: spot, shape: BoxShape.circle)),
         ]),
       ),
     );
@@ -291,24 +298,30 @@ class _ManageGroup extends StatelessWidget {
   const _ManageGroup({required this.expanded, required this.isOpen, required this.hasActive, required this.onToggle, required this.children});
   @override
   Widget build(BuildContext context) {
-    final dark = AppColors.isDark(context);
     // Saat minimize: header "Kelola" disembunyikan total agar tidak
     // overflow; hanya isi menu (children = ikon) yang ditampilkan.
     if (!expanded) return Column(children: children);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       InkWell(
         borderRadius: BorderRadius.circular(12),
-        hoverColor: AppColors.primary(context).withValues(alpha: 0.08),
+        hoverColor: AppColors.primaryColor.withValues(alpha: 0.08),
         onTap: onToggle,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             color: hasActive
-                ? (dark
-                    ? Colors.white.withValues(alpha: 0.06)
-                    : AppColors.lightText.withValues(alpha: 0.05))
+                ? AppColors.primaryColor.withValues(alpha: 0.08)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
+            // Garis kuning tipis sebagai penanda section aktif.
+            border: Border(
+              left: BorderSide(
+                color: hasActive
+                    ? AppColors.secondaryColor
+                    : Colors.transparent,
+                width: 3,
+              ),
+            ),
           ),
           child: Row(children: [
             Container(padding: const EdgeInsets.all(7),
@@ -349,15 +362,20 @@ class _ProfileFooter extends StatelessWidget {
     return Stack(children: [
       Container(
         width: 42, height: 42, alignment: Alignment.center,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [AppColors.primary(context), AppColors.secondary(context)]),
+        decoration: const BoxDecoration(
+          // Avatar profil: gradien header ungu, teks darkPrimary.
+          gradient: LinearGradient(colors: AppColors.headerGradient),
           shape: BoxShape.circle,
         ),
-        child: Text(initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
+        child: Text(initials,
+            style: const TextStyle(
+                color: AppColors.onHeaderText,
+                fontWeight: FontWeight.w800,
+                fontSize: 14)),
       ),
       Positioned(right: 0, bottom: 0, child: Container(width: 12, height: 12,
         decoration: BoxDecoration(color: AppColors.success, shape: BoxShape.circle,
-          border: Border.all(color: AppColors.card(context), width: 2)))),
+          border: Border.all(color: AppColors.secondaryColor, width: 2)))),
     ]);
   }
   @override

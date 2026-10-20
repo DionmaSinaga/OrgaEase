@@ -1,38 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:orga_ease/app_color.dart';
 
-/// Tema terang & gelap OrgaEase, selaras dengan palet baru di AppColors.
+/// Tema terang & gelap OrgaEase.
+/// Fondasi: primaryColor #834DFB, secondaryColor #FBD100,
+/// darkPrimary #18102B, lightPrimary #F6F3FF.
 class AppTheme {
   static ThemeData light() {
     final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.primaryPink,
+      seedColor: AppColors.primaryColor,
       brightness: Brightness.light,
     );
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.lightBackground,
-      primaryColor: AppColors.primaryPink,
+      scaffoldBackgroundColor: AppColors.lightPrimary,
+      primaryColor: AppColors.primaryColor,
       colorScheme: scheme.copyWith(
-        primary: AppColors.primaryPink,
-        secondary: AppColors.primaryTeal,
-        surface: Colors.white,
+        primary: AppColors.primaryColor,
+        secondary: AppColors.secondaryColor,
+        surface: AppColors.lightCard,
         error: AppColors.error,
       ),
-      cardColor: Colors.white,
+      cardColor: AppColors.lightCard,
       dividerColor: AppColors.lightBorder,
-      hoverColor: AppColors.primaryPink.withValues(alpha: 0.06),
-      splashColor: AppColors.primaryPink.withValues(alpha: 0.12),
-      // Tombol aksi utama: pink -> pinkHover saat ditekan/hover.
+      hoverColor: AppColors.primaryColor.withValues(alpha: 0.06),
+      splashColor: AppColors.primaryColor.withValues(alpha: 0.12),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
           backgroundColor: WidgetStateProperty.resolveWith((s) {
             if (s.contains(WidgetState.pressed) ||
                 s.contains(WidgetState.hovered) ||
                 s.contains(WidgetState.focused)) {
-              return AppColors.pinkHover;
+              return AppColors.primaryHover;
             }
-            return AppColors.primaryPink;
+            return AppColors.primaryColor;
           }),
           foregroundColor:
               const WidgetStatePropertyAll<Color>(Colors.white),
@@ -43,34 +44,30 @@ class AppTheme {
           foregroundColor: WidgetStateProperty.resolveWith((s) {
             if (s.contains(WidgetState.pressed) ||
                 s.contains(WidgetState.hovered)) {
-              return AppColors.pinkHover;
+              return AppColors.primaryHover;
             }
-            return AppColors.primaryPink;
+            return AppColors.primaryColor;
           }),
         ),
       ),
-      checkboxTheme: CheckboxThemeData(
-        fillColor: WidgetStateProperty.resolveWith((s) {
-          if (s.contains(WidgetState.selected)) {
-            return AppColors.primaryTeal;
-          }
-          return null;
-        }),
+      checkboxTheme: const CheckboxThemeData(
+        fillColor: WidgetStatePropertyAll<Color>(AppColors.primaryColor),
+        checkColor: WidgetStatePropertyAll<Color>(Colors.white),
       ),
-      inputDecorationTheme: InputDecorationTheme(
+      inputDecorationTheme: const InputDecorationTheme(
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           borderSide:
-              const BorderSide(color: AppColors.primaryTeal, width: 1.6),
+              BorderSide(color: AppColors.primaryColor, width: 1.6),
         ),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: const WidgetStatePropertyAll<Color>(Colors.white),
         trackColor: WidgetStateProperty.resolveWith((s) {
           if (s.contains(WidgetState.selected)) {
-            return AppColors.lightText.withValues(alpha: 0.85);
+            return AppColors.primaryColor.withValues(alpha: 0.85);
           }
-          return Colors.white.withValues(alpha: 0.45);
+          return AppColors.darkPrimary.withValues(alpha: 0.25);
         }),
       ),
     );
@@ -78,27 +75,27 @@ class AppTheme {
 
   static ThemeData dark() {
     final scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.darkPink,
+      seedColor: AppColors.primaryColor,
       brightness: Brightness.dark,
     );
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: AppColors.darkBackground,
-      primaryColor: AppColors.darkPink,
+      scaffoldBackgroundColor: AppColors.darkPrimary,
+      primaryColor: AppColors.primaryColor,
       colorScheme: scheme.copyWith(
-        primary: AppColors.darkPink,
-        secondary: AppColors.darkTeal,
+        primary: AppColors.primaryColor,
+        secondary: AppColors.secondaryColor,
         surface: AppColors.darkCard,
-        surfaceContainerHighest: AppColors.darkField,
+        surfaceContainerHighest: AppColors.darkCardAlt,
         error: AppColors.error,
       ),
       cardColor: AppColors.darkCard,
       dividerColor: AppColors.darkBorder,
-      hoverColor: AppColors.darkPink.withValues(alpha: 0.10),
-      splashColor: AppColors.darkPink.withValues(alpha: 0.16),
+      hoverColor: AppColors.primaryColor.withValues(alpha: 0.14),
+      splashColor: AppColors.primaryColor.withValues(alpha: 0.20),
       appBarTheme: const AppBarTheme(
-          backgroundColor: AppColors.darkBackground,
+          backgroundColor: AppColors.darkPrimary,
           foregroundColor: AppColors.darkText),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
@@ -106,13 +103,12 @@ class AppTheme {
             if (s.contains(WidgetState.pressed) ||
                 s.contains(WidgetState.hovered) ||
                 s.contains(WidgetState.focused)) {
-              return AppColors.darkPinkHover;
+              return AppColors.primaryHoverDark;
             }
-            return AppColors.darkPink;
+            return AppColors.primaryColor;
           }),
-          // Teks gelap di atas pink lembut agar kontras.
           foregroundColor:
-              const WidgetStatePropertyAll<Color>(AppColors.darkBackground),
+              const WidgetStatePropertyAll<Color>(Colors.white),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -120,37 +116,35 @@ class AppTheme {
           foregroundColor: WidgetStateProperty.resolveWith((s) {
             if (s.contains(WidgetState.pressed) ||
                 s.contains(WidgetState.hovered)) {
-              return AppColors.darkPinkHover;
+              return AppColors.primaryHoverDark;
             }
-            return AppColors.darkPink;
+            return AppColors.secondaryColor;
           }),
         ),
       ),
-      checkboxTheme: CheckboxThemeData(
-        fillColor: WidgetStateProperty.resolveWith((s) {
-          if (s.contains(WidgetState.selected)) {
-            return AppColors.darkTeal;
-          }
-          return null;
-        }),
-        checkColor:
-            const WidgetStatePropertyAll<Color>(AppColors.darkBackground),
+      checkboxTheme: const CheckboxThemeData(
+        fillColor: WidgetStatePropertyAll<Color>(AppColors.primaryColor),
+        checkColor: WidgetStatePropertyAll<Color>(Colors.white),
       ),
-      inputDecorationTheme: InputDecorationTheme(
+      inputDecorationTheme: const InputDecorationTheme(
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.all(Radius.circular(16)),
           borderSide:
-              const BorderSide(color: AppColors.darkTeal, width: 1.6),
+              BorderSide(color: AppColors.primaryColor, width: 1.6),
         ),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((s) {
-          if (s.contains(WidgetState.selected)) return AppColors.darkPink;
+          if (s.contains(WidgetState.selected)) {
+            return AppColors.secondaryColor;
+          }
           return Colors.white;
         }),
         trackColor: WidgetStateProperty.resolveWith((s) {
-          if (s.contains(WidgetState.selected)) return Colors.white;
-          return Colors.white.withValues(alpha: 0.35);
+          if (s.contains(WidgetState.selected)) {
+            return AppColors.primaryColor.withValues(alpha: 0.65);
+          }
+          return Colors.white.withValues(alpha: 0.30);
         }),
       ),
       snackBarTheme: const SnackBarThemeData(
@@ -163,4 +157,3 @@ class AppTheme {
 /// Helper kecil: true jika tema gelap sedang aktif.
 bool isDarkMode(BuildContext context) =>
     Theme.of(context).brightness == Brightness.dark;
-
