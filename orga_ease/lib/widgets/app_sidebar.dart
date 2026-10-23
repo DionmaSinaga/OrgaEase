@@ -177,7 +177,7 @@ class _Header extends StatelessWidget {
       height: 64,
       decoration: const BoxDecoration(
         // Referensi sidebar: #834DFB -> #E3D7FF (sama dgn topbar).
-          color: AppColors.primaryColor),
+          color: AppColors.lavenderMist,),
 
       padding: EdgeInsets.symmetric(horizontal: expanded ? 16 : 8, vertical: 10),
       // Clip agar Row expanded tidak overflow sesaat saat AnimatedContainer

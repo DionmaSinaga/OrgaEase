@@ -4,6 +4,7 @@ import 'package:orga_ease/models/app_user.dart';
 import 'package:orga_ease/repositories/organization_repository.dart';
 import 'package:orga_ease/widgets/auth_components.dart';
 import 'package:orga_ease/widgets/auth_textfield.dart';
+import 'package:orga_ease/widgets/app_top_bar.dart';
 
 /// Form pembuatan organisasi baru (dibuka dari FAB "Organisasi Saya").
 ///
@@ -160,9 +161,10 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: const Text('Buat Organisasi',
-            style: TextStyle(fontWeight: FontWeight.w800)),
+      appBar: AppTopBar(
+        title: 'Buat Organisasi',
+        showThemeSwitch: true,
+        showNotification: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -175,8 +177,8 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _pkField(),
-                    const SizedBox(height: 16),
+                    // _pkField(),
+                    // const SizedBox(height: 16),
                     _nameField(),
                     const SizedBox(height: 16),
                     _instansiField(),
@@ -210,15 +212,15 @@ class _CreateOrganizationPageState extends State<CreateOrganizationPage> {
   }
 
   // 1. Primary key — otomatis dari database, tidak bisa diisi manual.
-  Widget _pkField() {
-    return AuthTextField(
-      controller: _pkCtrl,
-      label: 'Primary Key (Otomatis dari DB)',
-      hint: 'Dibuat otomatis oleh database saat disimpan',
-      prefixIcon: Icons.fingerprint_rounded,
-      enabled: false,
-    );
-  }
+  // Widget _pkField() {
+  //   return AuthTextField(
+  //     controller: _pkCtrl,
+  //     label: 'Primary Key (Otomatis dari DB)',
+  //     hint: 'Dibuat otomatis oleh database saat disimpan',
+  //     prefixIcon: Icons.fingerprint_rounded,
+  //     enabled: false,
+  //   );
+  // }
 
   // 2. Nama organisasi (wajib) — juga dipakai sebagai kunci route.
   Widget _nameField() {

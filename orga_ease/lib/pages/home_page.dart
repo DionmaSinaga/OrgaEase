@@ -6,6 +6,7 @@ import 'package:orga_ease/pages/my_organizations_page.dart';
 import 'package:orga_ease/widgets/auth_components.dart';
 import 'package:orga_ease/widgets/app_sidebar.dart';
 import 'package:orga_ease/widgets/theme_switch.dart';
+import 'package:orga_ease/widgets/notification_button.dart';
 
 /// Homepage dgn sidebar kiri menyatu dgn appbar + bisa minimize.
 /// Sidebar berisi kategori homepage; bawah = profil ala Discord.
@@ -225,8 +226,7 @@ class _HomePageState extends State<HomePage> {
         // Switchbox dark mode tepat di sebelah tombol notifikasi.
         ThemeModeSwitch(compact: narrow),
         const SizedBox(width: 6),
-        IconButton(tooltip: 'Notifikasi', icon: const Icon(Icons.notifications_outlined, color: AppColors.onHeaderText),
-          onPressed: () => _soon('Notifikasi')),
+        AppNotificationButton(compact: narrow),
         const SizedBox(width: 4),
         // Container(width: 36, height: 36, alignment: Alignment.center,
         //   decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.25),

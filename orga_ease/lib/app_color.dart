@@ -93,8 +93,8 @@ class AppColors {
 
   /// Header homepage & sidebar: #834DFB -> #E3D7FF (selalu sama).
   static const List<Color> headerGradient = [
-    primaryColor,
     lavenderMist,
+    primaryColor,
   ];
 
   /// Teks di atas gradien header: darkPrimary (sesuai referensi).
